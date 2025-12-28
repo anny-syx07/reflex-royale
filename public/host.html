@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reflex Royale - Host</title>
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/host.css">
+</head>
+
+<body>
+  <!-- Waiting Room Screen -->
+  <div id="waitingScreen" class="screen">
+    <div class="container">
+      <h1 class="game-title text-gradient fade-in">⚡ REFLEX ROYALE ⚡</h1>
+
+      <div class="room-code-container glass fade-in">
+        <p class="room-code-label">Mã Phòng</p>
+        <h2 class="room-code" id="roomCode">------</h2>
+        <p class="room-code-instruction">Vào <strong>reflex-royale</strong> và nhập mã trên</p>
+      </div>
+
+      <div class="players-waiting glass fade-in">
+        <h3>🎮 Người Chơi Đang Chờ (<span id="playerCount">0</span>)</h3>
+        <div id="playerList" class="player-grid"></div>
+      </div>
+
+      <button id="startGameBtn" class="btn btn-primary btn-lg fade-in" disabled>
+        BẮT ĐẦU TRÒ CHƠI
+      </button>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="gameScreen" class="screen hidden">
+    <div class="game-header">
+      <div class="round-info">
+        Vòng <span id="currentRound">1</span>/<span id="totalRounds">7</span>
+      </div>
+      <div class="game-title-small text-gradient">REFLEX ROYALE</div>
+      <div class="host-controls">
+        <div class="timer-display" id="timerDisplay">
+          <span class="timer-icon">⏱️</span>
+          <span class="timer-value" id="timerValue">--</span>s
+        </div>
+        <button id="nextRoundBtn" class="btn btn-secondary">Vòng Tiếp Theo →</button>
+      </div>
+    </div>
+
+    <!-- Round Display Area -->
+    <div id="roundDisplay" class="round-display">
+      <!-- Content will be dynamically inserted -->
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="leaderboard-container">
+      <h3 class="leaderboard-title">🏆 BXH LIVE</h3>
+      <div id="leaderboard" class="leaderboard"></div>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen" class="screen hidden">
+    <div class="container">
+      <h1 class="game-title text-gradient fade-in">🎉 HOÀN THÀNH! 🎉</h1>
+
+      <div class="final-leaderboard glass">
+        <h2>🏆 BẢNG XẾP HẠNG CHUNG CUỘC</h2>
+        <div id="finalLeaderboard"></div>
+      </div>
+
+      <button id="newGameBtn" class="btn btn-primary btn-lg">
+        TẠO TRÒ CHƠI MỚI
+      </button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/host.js"></script>
+</body>
+
+</html>
