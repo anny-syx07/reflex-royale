@@ -11,7 +11,7 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // Host password (change this to your desired password)
-const HOST_PASSWORD = process.env.HOST_PASSWORD || 'reflex2025';
+const HOST_PASSWORD = process.env.HOST_PASSWORD || 'WelcometoUMT';
 
 // Root route - serve landing page
 app.get('/', (req, res) => {
