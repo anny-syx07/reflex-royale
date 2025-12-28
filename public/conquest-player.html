@@ -358,11 +358,15 @@
 
         // Submit actions
         function submitActions() {
+            console.log('[Conquest Client] Submitting actions:', pendingActions);
             if (pendingActions.length > 0) {
                 socket.emit('conquestSubmitActions', {
                     roomCode,
                     actions: pendingActions
                 });
+                console.log('[Conquest Client] Actions sent to server');
+            } else {
+                console.log('[Conquest Client] No actions to submit');
             }
         }
 

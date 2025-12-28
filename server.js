@@ -598,6 +598,8 @@ function endConquestRound(roomCode) {
     });
   });
 
+  console.log(`[Conquest] Round ${room.currentRound} - Total actions: ${room.playerActions.size}, Cells claimed: ${cellClaims.size}, Conflicts: ${conflicts.length}`);
+
   io.to(roomCode).emit('conquestRoundEnd');
 
   console.log(`Conquest round ${room.currentRound} ended in room ${roomCode}`);
