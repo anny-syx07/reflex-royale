@@ -1,0 +1,337 @@
+/* Campus Conquest - Shared Styles */
+
+:root {
+    --primary-purple: #667eea;
+    --primary-pink: #764ba2;
+    --grid-size: 10;
+    --cell-size: 30px;
+    --cell-gap: 2px;
+    
+    /* Player Colors */
+    --color-1: #FF6B6B;
+    --color-2: #4ECDC4;
+    --color-3: #45B7D1;
+    --color-4: #FFA07A;
+    --color-5: #98D8C8;
+    --color-6: #F7DC6F;
+    --color-7: #BB8FCE;
+    --color-8: #85C1E2;
+    --color-9: #F8B739;
+    --color-10: #52BE80;
+    --color-11: #EC7063;
+    --color-12: #5DADE2;
+    
+    --neutral-color: #E0E0E0;
+    --conflict-color: #FF0000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-pink) 100%);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Grid Container */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), var(--cell-size));
+    gap: var(--cell-gap);
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin: 0 auto;
+}
+
+.grid-container.large {
+    --cell-size: 50px;
+    --cell-gap: 3px;
+}
+
+/* Grid Cell */
+.grid-cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background: var(--neutral-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.grid-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.grid-cell.owned {
+    cursor: default;
+}
+
+.grid-cell.pending {
+    border: 2px solid #FFD700;
+    animation: pulse 0.8s infinite;
+}
+
+.grid-cell.claimed {
+    animation: cellClaim 0.4s ease;
+}
+
+.grid-cell.conflict {
+    animation: conflict 0.6s ease;
+}
+
+.grid-cell.special-2x {
+    border: 2px solid #FFD700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.grid-cell.special-3x {
+    border: 2px solid #9B59B6;
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+}
+
+/* Cell Multiplier Badge */
+.cell-multiplier {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 1px 4px;
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes cellClaim {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes conflict {
+    0%, 100% {
+        background-color: currentColor;
+    }
+    33% {
+        background-color: var(--conflict-color);
+        transform: scale(1.2);
+    }
+    66% {
+        background-color: var(--conflict-color);
+    }
+}
+
+/* Stats Panel */
+.stats-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-purple);
+}
+
+/* Timer */
+.timer {
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+}
+
+.timer.warning {
+    color: #FF6B6B;
+    animation: timerFlash 0.5s infinite;
+}
+
+@keyframes timerFlash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Action Points Display */
+.ap-display {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 15px;
+}
+
+.ap-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ddd;
+    transition: all 0.3s;
+}
+
+.ap-dot.active {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+/* Leaderboard */
+.leaderboard {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.leaderboard-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-purple);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.leaderboard-item:hover {
+    transform: translateX(5px);
+}
+
+.leaderboard-item.rank-1 {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: white;
+}
+
+.leaderboard-item.rank-2 {
+    background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+    color: white;
+}
+
+.leaderboard-item.rank-3 {
+    background: linear-gradient(135deg, #CD7F32, #B87333);
+    color: white;
+}
+
+.rank-badge {
+    font-size: 20px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+}
+
+.player-name {
+    flex: 1;
+    font-weight: 600;
+    padding: 0 15px;
+}
+
+.player-score {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Round Info */
+.round-info {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    margin: 10px;
+}
+
+.round-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--primary-purple);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 600px) {
+    .grid-container {
+        --cell-size: 28px;
+        --cell-gap: 1px;
+    }
+    
+    .stats-panel {
+        padding: 15px;
+        margin: 5px;
+    }
+    
+    .stat-value {
+        font-size: 20px;
+    }
+    
+    .timer {
+        font-size: 36px;
+        padding: 15px;
+    }
+}
+
+/* Player Color Classes */
+.player-color-0 { background-color: var(--color-1) !important; }
+.player-color-1 { background-color: var(--color-2) !important; }
+.player-color-2 { background-color: var(--color-3) !important; }
+.player-color-3 { background-color: var(--color-4) !important; }
+.player-color-4 { background-color: var(--color-5) !important; }
+.player-color-5 { background-color: var(--color-6) !important; }
+.player-color-6 { background-color: var(--color-7) !important; }
+.player-color-7 { background-color: var(--color-8) !important; }
+.player-color-8 { background-color: var(--color-9) !important; }
+.player-color-9 { background-color: var(--color-10) !important; }
+.player-color-10 { background-color: var(--color-11) !important; }
+.player-color-11 { background-color: var(--color-12) !important; }

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Conquest - Host</title>
+    <link rel="stylesheet" href="/css/conquest.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .main-display {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-header {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .game-title {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .game-subtitle {
+            font-size: 20px;
+            color: #666;
+        }
+
+        .grid-display {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .room-code-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 12px;
+            color: white;
+        }
+
+        .room-code {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin: 10px 0;
+        }
+
+        .waiting-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-pink) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+        }
+
+        .waiting-screen.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Waiting Screen -->
+    <div class="waiting-screen" id="waitingScreen">
+        <h1 style="font-size: 64px; margin-bottom: 30px;">🏛️ Đại Chiến Giảng Đường</h1>
+        <button class="btn btn-primary" onclick="createRoom()">Tạo Phòng Mới</button>
+    </div>
+
+    <!-- Main Game Display -->
+    <div class="main-display" id="mainDisplay" style="display: none;">
+        <div class="panel">
+            <div class="game-header">
+                <div class="game-title">🏛️ ĐẠI CHIẾN GIẢNG ĐƯỜNG</div>
+                <div class="game-subtitle" id="gameStatus">Waiting for players...</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="round-info">
+                <div class="round-number" id="roundDisplay">Round 1/12</div>
+                <div class="timer" id="timer">12</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="grid-display">
+                <div id="gridContainer"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="controls">
+                <button class="btn btn-primary" id="startBtn" onclick="startGame()">Bắt Đầu Trò Chơi</button>
+                <button class="btn btn-secondary" id="nextBtn" onclick="nextRound()" style="display: none;">Vòng Tiếp
+                    Theo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar" style="display: none;">
+        <div class="panel room-code-display">
+            <div>Mã Phòng</div>
+            <div class="room-code" id="roomCode">------</div>
+            <div style="font-size: 16px;">Người chơi nhập mã này để tham gia</div>
+        </div>
+
+        <div class="panel">
+            <div class="leaderboard">
+                <div class="leaderboard-title">🏆 TOP 10</div>
+                <div id="leaderboardList"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <span class="stat-label">Người chơi</span>
+                    <span class="stat-value" id="playerCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Cells chiếm</span>
+                    <span class="stat-value" id="totalCells">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/conquest-game.js"></script>
+    <script>
+        const socket = io();
+
+        let roomCode = null;
+        let grid = null;
+        let renderer = null;
+        let timerInterval = null;
+
+        function createRoom() {
+            socket.emit('createConquestRoom');
+        }
+
+        socket.on('conquestRoomCreated', (data) => {
+            roomCode = data.roomCode;
+            document.getElementById('roomCode').textContent = roomCode;
+            document.getElementById('waitingScreen').classList.add('hidden');
+            document.getElementById('mainDisplay').style.display = 'flex';
+            document.getElementById('sidebar').style.display = 'flex';
+
+            // Initialize grid
+            grid = new ConquestGrid(10);
+            grid.initializeSpecialCells(8);
+            const container = document.getElementById('gridContainer');
+            renderer = new ConquestRenderer(container, grid, {
+                large: true,
+                clickable: false
+            });
+        });
+
+        socket.on('conquestPlayerListUpdate', (data) => {
+            document.getElementById('playerCount').textContent = data.players.length;
+        });
+
+        function startGame() {
+            socket.emit('startConquestGame', { roomCode });
+            document.getElementById('startBtn').style.display = 'none';
+        }
+
+        socket.on('conquestGameStarted', () => {
+            document.getElementById('gameStatus').textContent = 'Game in progress...';
+        });
+
+        socket.on('conquestRoundStart', (data) => {
+            const { roundNumber, maxRounds, mapState, duration } = data;
+
+            document.getElementById('roundDisplay').textContent = `Round ${roundNumber}/${maxRounds}`;
+
+            grid.import(mapState);
+            renderer.render();
+
+            startTimer(duration / 1000);
+
+            document.getElementById('nextBtn').style.display = 'none';
+        });
+
+        socket.on('conquestMapUpdate', (data) => {
+            const { grid: gridData, leaderboard, conflictsThisRound } = data;
+
+            grid.grid = gridData;
+
+            // Show conflicts
+            conflictsThisRound.forEach(({ x, y }) => {
+                renderer.showConflict(x, y);
+            });
+
+            // Update map after conflict animation
+            setTimeout(() => {
+                renderer.render();
+            }, 700);
+
+            // Update leaderboard
+            updateLeaderboard(leaderboard);
+
+            // Count total claimed cells
+            let total = 0;
+            for (let x = 0; x < grid.size; x++) {
+                for (let y = 0; y < grid.size; y++) {
+                    if (grid.grid[x][y] !== null) total++;
+                }
+            }
+            document.getElementById('totalCells').textContent = total;
+        });
+
+        socket.on('conquestRoundEnd', () => {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        });
+
+        socket.on('conquestGameOver', (data) => {
+            document.getElementById('gameStatus').textContent = '🎉 Trò Chơi Kết Thúc!';
+            document.getElementById('nextBtn').style.display = 'none';
+            updateLeaderboard(data.finalLeaderboard);
+        });
+
+        function nextRound() {
+            socket.emit('conquestNextRound', { roomCode });
+        }
+
+        function startTimer(seconds) {
+            let remaining = seconds;
+            const timerEl = document.getElementById('timer');
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                remaining--;
+                timerEl.textContent = remaining;
+
+                if (remaining <= 3) {
+                    timerEl.classList.add('warning');
+                } else {
+                    timerEl.classList.remove('warning');
+                }
+
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+
+        function updateLeaderboard(leaderboard) {
+            const container = document.getElementById('leaderboardList');
+            container.innerHTML = '';
+
+            leaderboard.slice(0, 10).forEach((player, index) => {
+                const item = document.createElement('div');
+                item.className = `leaderboard-item rank-${index + 1}`;
+
+                const rankBadge = document.createElement('div');
+                rankBadge.className = 'rank-badge';
+                rankBadge.textContent = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+
+                const name = document.createElement('div');
+                name.className = 'player-name';
+                name.textContent = player.nickname;
+
+                const score = document.createElement('div');
+                score.className = 'player-score';
+                score.textContent = player.territory || 0;
+
+                item.appendChild(rankBadge);
+                item.appendChild(name);
+                item.appendChild(score);
+                container.appendChild(item);
+            });
+        }
+    </script>
+</body>
+
+</html>

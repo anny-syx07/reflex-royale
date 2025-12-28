@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Campus Conquest - Player</title>
+    <link rel="stylesheet" href="/css/conquest.css">
+    <style>
+        .player-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 10px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-purple);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .timer-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-purple);
+        }
+
+        .timer-display.warning {
+            color: #FF6B6B;
+            animation: timerPulse 0.5s infinite;
+        }
+
+        @keyframes timerPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .round-display {
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .grid-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        .footer {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .your-stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-purple);
+        }
+
+        .waiting-screen,
+        .game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-pink) 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .waiting-screen.show,
+        .game-over-screen.show {
+            display: flex;
+        }
+
+        .big-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .big-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .final-rank {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .final-score {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="player-container" id="gameContainer" style="display: none;">
+        <div class="header">
+            <div class="game-title">🏛️ ĐẠI CHIẾN GIẢNG ĐƯỜNG</div>
+            <div class="status-bar">
+                <div class="round-display" id="roundDisplay">Round 1/12</div>
+                <div class="timer-display" id="timer">12</div>
+                <div class="ap-display" id="apDisplay"></div>
+            </div>
+        </div>
+
+        <div class="grid-wrapper">
+            <div id="gridContainer"></div>
+        </div>
+
+        <div class="footer">
+            <div class="your-stats">
+                <div class="stat">
+                    <div class="stat-label">Your Territory</div>
+                    <div class="stat-value" id="territoryCount">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Your Rank</div>
+                    <div class="stat-value" id="playerRank">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiting Screen -->
+    <div class="waiting-screen show" id="waitingScreen">
+        <div class="big-icon">⏳</div>
+        <div class="big-title">Waiting for Game...</div>
+        <div class="message">Nhập mã phòng để tham gia</div>
+        <div style="margin-top: 20px;">
+            <input type="text" id="roomCodeInput" placeholder="Room Code"
+                style="padding: 15px; font-size: 18px; border-radius: 8px; border: none; text-align: center; text-transform: uppercase; width: 200px; margin-bottom: 15px;">
+            <br>
+            <input type="text" id="nicknameInput" placeholder="Your Nickname"
+                style="padding: 15px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-bottom: 15px;">
+            <br>
+            <button onclick="joinGame()"
+                style="padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 8px; border: none; background: white; color: var(--primary-purple); cursor: pointer;">
+                Tham Gia
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="game-over-screen" id="gameOverScreen">
+        <div class="big-icon">🏆</div>
+        <div class="big-title">Trò Chơi Kết Thúc!</div>
+        <div class="final-rank" id="finalRank">#1</div>
+        <div class="final-score" id="finalScore">50 territories</div>
+        <div class="message">Cảm ơn bạn đã chơi!</div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/conquest-game.js"></script>
+    <script>
+        const socket = io();
+
+        let roomCode = null;
+        let playerId = null;
+        let nickname = '';
+        let grid = null;
+        let renderer = null;
+        let currentAP = 3;
+        let maxAP = 3;
+        let pendingActions = [];
+        let timerInterval = null;
+
+        // Join game
+        function joinGame() {
+            roomCode = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+            nickname = document.getElementById('nicknameInput').value.trim() || 'Player';
+
+            if (!roomCode) {
+                alert('Vui lòng nhập mã phòng!');
+                return;
+            }
+
+            socket.emit('joinConquestRoom', { roomCode, nickname });
+        }
+
+        // Socket: Successfully joined
+        socket.on('conquestJoined', (data) => {
+            playerId = data.playerId;
+            roomCode = data.roomCode;
+
+            document.getElementById('waitingScreen').classList.remove('show');
+            document.getElementById('gameContainer').style.display = 'flex';
+        });
+
+        // Socket: Round start
+        socket.on('conquestRoundStart', (data) => {
+            const { roundNumber, maxRounds, currentAP: ap, mapState } = data;
+
+            // Update UI
+            document.getElementById('roundDisplay').textContent = `Round ${roundNumber}/${maxRounds}`;
+            currentAP = ap;
+            maxAP = ap;
+            pendingActions = [];
+
+            // Initialize or update grid
+            if (!grid) {
+                grid = new ConquestGrid(10);
+                const container = document.getElementById('gridContainer');
+                renderer = new ConquestRenderer(container, grid, { clickable: true });
+                renderer.onCellClick = handleCellClick;
+            }
+
+            grid.import(mapState);
+            grid.initializeSpecialCells(8);
+            renderer.render();
+
+            updateAPDisplay();
+
+            // Start timer
+            startTimer(data.duration / 1000);
+        });
+
+        // Handle cell click
+        function handleCellClick(x, y) {
+            // Check if cell is already owned
+            if (grid.getCell(x, y) !== null) {
+                return;
+            }
+
+            const actionKey = `${x},${y}`;
+            const actionIndex = pendingActions.findIndex(a => `${a.x},${a.y}` === actionKey);
+
+            if (actionIndex >= 0) {
+                // Undo action
+                pendingActions.splice(actionIndex, 1);
+                currentAP++;
+                renderer.markPending(x, y, false);
+            } else {
+                // Add action
+                if (currentAP > 0) {
+                    pendingActions.push({ x, y });
+                    currentAP--;
+                    renderer.markPending(x, y, true);
+                    playSound('click');
+                }
+            }
+
+            updateAPDisplay();
+        }
+
+        // Update AP display
+        function updateAPDisplay() {
+            const container = document.getElementById('apDisplay');
+            container.innerHTML = '';
+
+            for (let i = 0; i < maxAP; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'ap-dot';
+                if (i < maxAP - currentAP) {
+                    dot.classList.add('active');
+                }
+                container.appendChild(dot);
+            }
+        }
+
+        // Start countdown timer
+        function startTimer(seconds) {
+            let remaining = seconds;
+            const timerEl = document.getElementById('timer');
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                remaining--;
+                timerEl.textContent = remaining;
+
+                if (remaining <= 3) {
+                    timerEl.classList.add('warning');
+                } else {
+                    timerEl.classList.remove('warning');
+                }
+
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitActions();
+                }
+            }, 1000);
+        }
+
+        // Submit actions
+        function submitActions() {
+            if (pendingActions.length > 0) {
+                socket.emit('conquestSubmitActions', {
+                    roomCode,
+                    actions: pendingActions
+                });
+            }
+        }
+
+        // Socket: Round end
+        socket.on('conquestRoundEnd', (data) => {
+            const { mapState, conflicts, yourTerritory, yourRank } = data;
+
+            // Update grid
+            grid.import(mapState);
+
+            // Show conflicts
+            conflicts.forEach(({ x, y }) => {
+                renderer.showConflict(x, y);
+            });
+
+            // Update cells
+            setTimeout(() => {
+                renderer.render();
+            }, 700);
+
+            // Update stats
+            document.getElementById('territoryCount').textContent = yourTerritory || 0;
+            document.getElementById('playerRank').textContent = yourRank ? `#${yourRank}` : '-';
+
+            // Reset pending
+            pendingActions = [];
+        });
+
+        // Socket: Game over
+        socket.on('conquestGameOver', (data) => {
+            const { yourRank, yourTerritory } = data;
+
+            document.getElementById('finalRank').textContent = `#${yourRank}`;
+            document.getElementById('finalScore').textContent = `${yourTerritory} territories`;
+            document.getElementById('gameOverScreen').classList.add('show');
+        });
+
+        // Socket: Error
+        socket.on('error', (data) => {
+            alert(data.message);
+        });
+    </script>
+</body>
+
+</html>

@@ -245,6 +245,70 @@ io.on('connection', (socket) => {
     startNextRound(roomCode);
   });
 
+  // === CAMPUS CONQUEST HANDLERS ===
+  socket.on('createConquestRoom', () => {
+    const roomCode = generateRoomCode();
+    const room = {
+      code: roomCode,
+      hostId: socket.id,
+      gameMode: 'CONQUEST',
+      players: new Map(),
+      gameState: 'WAITING',
+      currentRound: 0,
+      maxRounds: 12,
+      grid: Array(10).fill(null).map(() => Array(10).fill(null)),
+      specialCells: generateSpecialCells(),
+      playerActions: new Map(),
+      roundTimer: null
+    };
+    rooms.set(roomCode, room);
+    socket.join(roomCode);
+    socket.emit('conquestRoomCreated', { roomCode });
+  });
+
+  socket.on('joinConquestRoom', ({ roomCode, nickname }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.gameMode !== 'CONQUEST') {
+      socket.emit('error', { message: 'Phòng không tồn tại!' });
+      return;
+    }
+    if (room.gameState !== 'WAITING') {
+      socket.emit('error', { message: 'Trò chơi đã bắt đầu!' });
+      return;
+    }
+    const player = {
+      id: socket.id,
+      nickname: nickname || `Player${room.players.size + 1}`,
+      territory: 0
+    };
+    room.players.set(socket.id, player);
+    socket.join(roomCode);
+    socket.emit('conquestJoined', { roomCode, playerId: socket.id });
+    const playerList = Array.from(room.players.values());
+    io.to(roomCode).emit('conquestPlayerListUpdate', { players: playerList });
+  });
+
+  socket.on('startConquestGame', ({ roomCode }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.hostId !== socket.id || room.gameMode !== 'CONQUEST') return;
+    room.gameState = 'PLAYING';
+    room.currentRound = 0;
+    io.to(roomCode).emit('conquestGameStarted');
+    setTimeout(() => startConquestRound(roomCode), 2000);
+  });
+
+  socket.on('conquestSubmitActions', ({ roomCode, actions }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.gameState !== 'PLAYING') return;
+    room.playerActions.set(socket.id, actions);
+  });
+
+  socket.on('conquestNextRound', ({ roomCode }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.hostId !== socket.id) return;
+    startConquestRound(roomCode);
+  });
+
   // Disconnect handling
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
@@ -414,6 +478,174 @@ function endGame(roomCode) {
   io.to(roomCode).emit('gameOver', { finalLeaderboard });
   console.log(`Game ended in room ${roomCode}`);
 }
+
+// Start conquest round
+function startConquestRound(roomCode) {
+  const room = rooms.get(roomCode);
+  if (!room) return;
+
+  room.currentRound++;
+
+  if (room.currentRound > room.maxRounds) {
+    endConquestGame(roomCode);
+    return;
+  }
+
+  room.playerActions.clear();
+
+  const mapState = {
+    grid: room.grid.map(row => [...row]),
+    specialCells: room.specialCells
+  };
+
+  io.to(roomCode).emit('conquestRoundStart', {
+    roundNumber: room.currentRound,
+    maxRounds: room.maxRounds,
+    currentAP: 3,
+    mapState,
+    duration: 12000
+  });
+
+  console.log(`Conquest round ${room.currentRound} started in room ${roomCode}`);
+
+  // Auto-end round after 12 seconds
+  if (room.roundTimer) clearTimeout(room.roundTimer);
+  room.roundTimer = setTimeout(() => endConquestRound(roomCode), 12000);
+}
+
+// End conquest round
+function endConquestRound(roomCode) {
+  const room = rooms.get(roomCode);
+  if (!room) return;
+
+  // Resolve conflicts
+  const cellClaims = new Map();
+
+  room.playerActions.forEach((actions, playerId) => {
+    actions.forEach(({ x, y }) => {
+      const key = `${x},${y}`;
+      if (!cellClaims.has(key)) cellClaims.set(key, []);
+      cellClaims.get(key).push(playerId);
+    });
+  });
+
+  const conflicts = [];
+
+  cellClaims.forEach((claimants, key) => {
+    const [x, y] = key.split(',').map(Number);
+
+    if (claimants.length === 1) {
+      // Single claim = success
+      room.grid[x][y] = claimants[0];
+    } else {
+      // Conflict = nobody gets it
+      conflicts.push({ x, y });
+    }
+  });
+
+  // Calculate territories
+  room.players.forEach((player, playerId) => {
+    let territory = 0;
+    for (let x = 0; x < 10; x++) {
+      for (let y = 0; y < 10; y++) {
+        if (room.grid[x][y] === playerId) {
+          const multiplier = getCellMultiplier(room.specialCells, x, y);
+          territory += multiplier;
+        }
+      }
+    }
+    player.territory = territory;
+  });
+
+  // Build leaderboard
+  const leaderboard = Array.from(room.players.values())
+    .sort((a, b) => b.territory - a.territory)
+    .map((p, index) => ({ ...p, rank: index + 1 }));
+
+  // Send updates
+  const mapState = {
+    grid: room.grid.map(row => [...row]),
+    specialCells: room.specialCells
+  };
+
+  io.to(roomCode).emit('conquestMapUpdate', {
+    grid: room.grid,
+    leaderboard,
+    conflictsThisRound: conflicts
+  });
+
+  room.players.forEach((player, playerId) => {
+    const playerRank = leaderboard.find(p => p.id === playerId)?.rank || '-';
+    io.to(playerId).emit('conquestRoundEnd', {
+      mapState,
+      conflicts,
+      yourTerritory: player.territory,
+      yourRank: playerRank
+    });
+  });
+
+  io.to(roomCode).emit('conquestRoundEnd');
+
+  console.log(`Conquest round ${room.currentRound} ended in room ${roomCode}`);
+}
+
+// End conquest game
+function endConquestGame(roomCode) {
+  const room = rooms.get(roomCode);
+  if (!room) return;
+
+  room.gameState = 'FINISHED';
+
+  const finalLeaderboard = Array.from(room.players.values())
+    .sort((a, b) => b.territory - a.territory)
+    .map((p, index) => ({ ...p, rank: index + 1 }));
+
+  room.players.forEach((player, playerId) => {
+    const playerRank = finalLeaderboard.find(p => p.id === playerId)?.rank || '-';
+    io.to(playerId).emit('conquestGameOver', {
+      yourRank: playerRank,
+      yourTerritory: player.territory
+    });
+  });
+
+  io.to(room.hostId).emit('conquestGameOver', { finalLeaderboard });
+
+  console.log(`Conquest game ended in room ${roomCode}`);
+}
+
+// Helper: Generate special cells
+function generateSpecialCells(count = 8) {
+  const cells = [];
+  const positions = new Set();
+
+  while (cells.length < count) {
+    const x = Math.floor(Math.random() * 10);
+    const y = Math.floor(Math.random() * 10);
+    const key = `${x},${y}`;
+
+    if (!positions.has(key)) {
+      positions.add(key);
+      cells.push({
+        x,
+        y,
+        multiplier: cells.length < count / 2 ? 2 : 3
+      });
+    }
+  }
+
+  return cells;
+}
+
+// Helper: Get cell multiplier
+function getCellMultiplier(specialCells, x, y) {
+  const special = specialCells.find(cell => cell.x === x && cell.y === y);
+  return special ? special.multiplier : 1;
+}
+
+// =============================================================================
+// END CAMPUS CONQUEST
+// =============================================================================
+
 
 // Start server
 http.listen(PORT, () => {
