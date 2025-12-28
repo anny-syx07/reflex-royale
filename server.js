@@ -318,6 +318,21 @@ io.on('connection', (socket) => {
     console.log(`[Conquest] Player ${socket.id} submitted ${actions.length} actions for room ${roomCode}`);
   });
 
+  // Real-time cell selection for host visibility
+  socket.on('conquestCellClicked', ({ roomCode, x, y, action }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.gameState !== 'PLAYING') return;
+
+    // Broadcast to host only
+    io.to(room.hostId).emit('conquestPlayerCellUpdate', {
+      playerId: socket.id,
+      playerNickname: room.players.get(socket.id)?.nickname || 'Player',
+      x,
+      y,
+      action // 'add' or 'remove'
+    });
+  });
+
   socket.on('conquestNextRound', ({ roomCode }) => {
     const room = rooms.get(roomCode);
     if (!room || room.hostId !== socket.id) return;

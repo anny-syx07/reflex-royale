@@ -254,6 +254,54 @@
             document.getElementById('nextBtn').style.display = 'none';
         });
 
+        // Real-time player cell selections
+        const playerPendingCells = new Map(); // playerId -> [{x, y}]
+
+        socket.on('conquestPlayerCellUpdate', ({ playerId, playerNickname, x, y, action }) => {
+            if (!playerPendingCells.has(playerId)) {
+                playerPendingCells.set(playerId, []);
+            }
+
+            const cells = playerPendingCells.get(playerId);
+
+            if (action === 'add') {
+                cells.push({ x, y });
+            } else if (action === 'remove') {
+                const index = cells.findIndex(c => c.x === x && c.y === y);
+                if (index >= 0) cells.splice(index, 1);
+            }
+
+            // Update cell display
+            updatePendingCellDisplay();
+        });
+
+        function updatePendingCellDisplay() {
+            // Clear all pending indicators first
+            document.querySelectorAll('.pending-indicator').forEach(el => el.remove());
+
+            // Add indicators for each player's pending cells
+            playerPendingCells.forEach((cells, playerId) => {
+                cells.forEach(({ x, y }) => {
+                    const cell = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                    if (cell && !cell.classList.contains('owned')) {
+                        // Add small indicator
+                        const indicator = document.createElement('div');
+                        indicator.className = 'pending-indicator';
+                        indicator.textContent = '👤';
+                        indicator.style.cssText = `
+                            position: absolute; 
+                            top: 2px; 
+                            left: 2px; 
+                            font-size: 12px;
+                            pointer-events: none;
+                        `;
+                        cell.style.position = 'relative';
+                        cell.appendChild(indicator);
+                    }
+                });
+            });
+        }
+
         socket.on('conquestMapUpdate', (data) => {
             const { grid: gridData, leaderboard, conflictsThisRound } = data;
 

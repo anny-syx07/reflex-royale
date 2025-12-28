@@ -304,6 +304,9 @@
                 pendingActions.splice(actionIndex, 1);
                 currentAP++;
                 renderer.markPending(x, y, false);
+                
+                // Notify server (remove)
+                socket.emit('conquestCellClicked', { roomCode, x, y, action: 'remove' });
             } else {
                 // Add action
                 if (currentAP > 0) {
@@ -311,6 +314,9 @@
                     currentAP--;
                     renderer.markPending(x, y, true);
                     playSound('click');
+                    
+                    // Notify server (add)
+                    socket.emit('conquestCellClicked', { roomCode, x, y, action: 'add' });
                 }
             }
 
