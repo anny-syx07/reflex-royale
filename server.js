@@ -315,6 +315,7 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomCode);
     if (!room || room.gameState !== 'PLAYING') return;
     room.playerActions.set(socket.id, actions);
+    console.log(`[Conquest] Player ${socket.id} submitted ${actions.length} actions for room ${roomCode}`);
   });
 
   socket.on('conquestNextRound', ({ roomCode }) => {
