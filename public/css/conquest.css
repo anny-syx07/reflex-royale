@@ -6,7 +6,7 @@
     --grid-size: 10;
     --cell-size: 30px;
     --cell-gap: 2px;
-    
+
     /* Player Colors */
     --color-1: #FF6B6B;
     --color-2: #4ECDC4;
@@ -20,7 +20,7 @@
     --color-10: #52BE80;
     --color-11: #EC7063;
     --color-12: #5DADE2;
-    
+
     --neutral-color: #E0E0E0;
     --conflict-color: #FF0000;
 }
@@ -114,9 +114,12 @@ body {
 
 /* Animations */
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.6;
     }
@@ -126,22 +129,28 @@ body {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.3);
     }
+
     100% {
         transform: scale(1);
     }
 }
 
 @keyframes conflict {
-    0%, 100% {
+
+    0%,
+    100% {
         background-color: currentColor;
     }
+
     33% {
         background-color: var(--conflict-color);
         transform: scale(1.2);
     }
+
     66% {
         background-color: var(--conflict-color);
     }
@@ -181,11 +190,14 @@ body {
 
 /* Timer */
 .timer {
-    font-size: 48px;
+    font-size: 72px;
     font-weight: bold;
     text-align: center;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
     padding: 20px;
 }
 
@@ -195,8 +207,15 @@ body {
 }
 
 @keyframes timerFlash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* Action Points Display */
@@ -306,16 +325,16 @@ body {
         --cell-size: 28px;
         --cell-gap: 1px;
     }
-    
+
     .stats-panel {
         padding: 15px;
         margin: 5px;
     }
-    
+
     .stat-value {
         font-size: 20px;
     }
-    
+
     .timer {
         font-size: 36px;
         padding: 15px;
@@ -323,15 +342,50 @@ body {
 }
 
 /* Player Color Classes */
-.player-color-0 { background-color: var(--color-1) !important; }
-.player-color-1 { background-color: var(--color-2) !important; }
-.player-color-2 { background-color: var(--color-3) !important; }
-.player-color-3 { background-color: var(--color-4) !important; }
-.player-color-4 { background-color: var(--color-5) !important; }
-.player-color-5 { background-color: var(--color-6) !important; }
-.player-color-6 { background-color: var(--color-7) !important; }
-.player-color-7 { background-color: var(--color-8) !important; }
-.player-color-8 { background-color: var(--color-9) !important; }
-.player-color-9 { background-color: var(--color-10) !important; }
-.player-color-10 { background-color: var(--color-11) !important; }
-.player-color-11 { background-color: var(--color-12) !important; }
+.player-color-0 {
+    background-color: var(--color-1) !important;
+}
+
+.player-color-1 {
+    background-color: var(--color-2) !important;
+}
+
+.player-color-2 {
+    background-color: var(--color-3) !important;
+}
+
+.player-color-3 {
+    background-color: var(--color-4) !important;
+}
+
+.player-color-4 {
+    background-color: var(--color-5) !important;
+}
+
+.player-color-5 {
+    background-color: var(--color-6) !important;
+}
+
+.player-color-6 {
+    background-color: var(--color-7) !important;
+}
+
+.player-color-7 {
+    background-color: var(--color-8) !important;
+}
+
+.player-color-8 {
+    background-color: var(--color-9) !important;
+}
+
+.player-color-9 {
+    background-color: var(--color-10) !important;
+}
+
+.player-color-10 {
+    background-color: var(--color-11) !important;
+}
+
+.player-color-11 {
+    background-color: var(--color-12) !important;
+}
