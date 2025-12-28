@@ -57,6 +57,21 @@ const DIRECTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
+  // Check room mode (for unified player entry)
+  socket.on('checkRoomMode', ({ roomCode }, callback) => {
+    const room = rooms.get(roomCode);
+
+    if (!room) {
+      callback({ error: 'Phòng không tồn tại!' });
+      return;
+    }
+
+    callback({
+      gameMode: room.gameMode || 'REFLEX',
+      roomCode
+    });
+  });
+
   // Host creates a room
   socket.on('createRoom', () => {
     const roomCode = generateRoomCode();

@@ -228,6 +228,18 @@
         let pendingActions = [];
         let timerInterval = null;
 
+        // Auto-join from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlRoomCode = urlParams.get('roomCode');
+        const urlNickname = urlParams.get('nickname');
+
+        if (urlRoomCode && urlNickname) {
+            // Auto-join
+            document.getElementById('roomCodeInput').value = urlRoomCode;
+            document.getElementById('nicknameInput').value = urlNickname;
+            setTimeout(() => joinGame(), 500);
+        }
+
         // Join game
         function joinGame() {
             roomCode = document.getElementById('roomCodeInput').value.trim().toUpperCase();
