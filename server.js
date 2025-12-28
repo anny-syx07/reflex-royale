@@ -521,7 +521,8 @@ function startConquestRound(roomCode) {
     return;
   }
 
-  room.playerActions.clear();
+  // DON'T clear playerActions here - they haven't been processed yet!
+  // Clearing happens in endConquestRound AFTER processing
 
   const mapState = {
     grid: room.grid.map(row => [...row]),
@@ -619,6 +620,9 @@ function endConquestRound(roomCode) {
   io.to(roomCode).emit('conquestRoundEnd');
 
   console.log(`Conquest round ${room.currentRound} ended in room ${roomCode}`);
+
+  // Clear actions AFTER processing them
+  room.playerActions.clear();
 }
 
 // End conquest game
