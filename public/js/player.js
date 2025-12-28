@@ -37,6 +37,17 @@ const tapCountEl = document.getElementById('tapCount');
 const scoreValue = document.getElementById('scoreValue');
 const feedback = document.getElementById('feedback');
 
+// Auto-join from URL params
+const urlParams = new URLSearchParams(window.location.search);
+const urlRoomCode = urlParams.get('roomCode');
+const urlNickname = urlParams.get('nickname');
+
+if (urlRoomCode && urlNickname) {
+    roomCodeInput.value = urlRoomCode;
+    nicknameInput.value = urlNickname;
+    setTimeout(() => joinBtn.click(), 500);
+}
+
 // Join room
 joinBtn.addEventListener('click', () => {
     const code = roomCodeInput.value.trim().toUpperCase();

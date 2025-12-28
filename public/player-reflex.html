@@ -3,157 +3,82 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Player - Reflex Royale</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        #joinScreen {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        #gameFrame {
-            display: none;
-            width: 100%;
-            height: 100vh;
-            border: none;
-        }
-
-        .loading {
-            color: white;
-            font-size: 24px;
-            text-align: center;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Reflex Royale - Player</title>
+    <link rel="stylesheet" href="/css/shared.css">
+    <link rel="stylesheet" href="/css/player.css">
 </head>
 
 <body>
-    <div id="joinScreen">
-        <h1>🎮 Tham Gia Phòng</h1>
-        <p class="subtitle">Nhập mã phòng để chơi</p>
+    <!-- Join Screen -->
+    <div id="joinScreen" class="screen">
+        <div class="container">
+            <h1 class="game-title text-gradient">⚡ REFLEX ROYALE ⚡</h1>
 
-        <input type="text" id="roomCode" placeholder="Nhập mã phòng" maxlength="6">
-        <input type="text" id="nickname" placeholder="Tên của bạn">
-        <button onclick="joinRoom()">Tham Gia</button>
-
-        <p id="error" style="color: red; margin-top: 15px;"></p>
+            <div class="join-form glass">
+                <input type="text" id="roomCodeInput" placeholder="Nhập mã phòng" maxlength="6" autocomplete="off">
+                <input type="text" id="nicknameInput" placeholder="Tên của bạn" maxlength="20">
+                <button id="joinBtn" class="btn btn-primary">THAM GIA</button>
+                <div id="errorMessage" class="error-message hidden"></div>
+            </div>
+        </div>
     </div>
 
-    <iframe id="gameFrame"></iframe>
+    <!-- Waiting Screen -->
+    <div id="waitingScreen" class="screen hidden">
+        <div class="container">
+            <h2 class="text-gradient">Đã Vào Phòng!</h2>
+            <p class="waiting-text">Đợi MC bắt đầu trò chơi...</p>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen hidden">
+        <!-- Color Buttons -->
+        <div id="colorButtons" class="color-buttons hidden">
+            <button class="color-btn color-btn-red" data-color="RED">ĐỎ</button>
+            <button class="color-btn color-btn-blue" data-color="BLUE">XANH</button>
+            <button class="color-btn color-btn-yellow" data-color="YELLOW">VÀNG</button>
+            <button class="color-btn color-btn-purple" data-color="PURPLE">TÍM</button>
+        </div>
+
+        <!-- Swipe Area -->
+        <div id="swipeArea" class="swipe-area hidden">
+            <div class="swipe-instruction">VUỐT THEO MŨI TÊN!</div>
+            <div class="swipe-indicator" id="swipeIndicator"></div>
+        </div>
+
+        <!-- Shake Area -->
+        <div id="shakeArea" class="shake-area hidden">
+            <div class="shake-icon">📱</div>
+            <h2>LẮC ĐIỆN THOẠI!</h2>
+            <div class="shake-count" id="shakeCount">0</div>
+            <p class="shake-label">lần lắc</p>
+        </div>
+
+        <!-- Tap Spam Button -->
+        <div id="tapSpamArea" class="tap-spam-area hidden">
+            <h2>CHẠM LIÊN TỤC!</h2>
+            <button id="tapSpamBtn" class="tap-spam-btn">GO!</button>
+            <div class="tap-count" id="tapCount">0</div>
+            <p class="tap-label">lần chạm</p>
+        </div>
+
+        <!-- Score Display -->
+        <div id="scoreDisplay" class="score-display">
+            <div class="score-label">Điểm của bạn</div>
+            <div class="score-value" id="scoreValue">0</div>
+        </div>
+
+        <!-- Feedback -->
+        <div id="feedback" class="feedback hidden"></div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-
-        function joinRoom() {
-            const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
-            const nickname = document.getElementById('nickname').value.trim() || 'Player';
-            const errorEl = document.getElementById('error');
-
-            if (!roomCode) {
-                errorEl.textContent = 'Vui lòng nhập mã phòng!';
-                return;
-            }
-
-            errorEl.textContent = '';
-
-            // Check room mode
-            socket.emit('checkRoomMode', { roomCode }, (response) => {
-                if (response.error) {
-                    errorEl.textContent = response.error;
-                    return;
-                }
-
-                // Redirect to appropriate game page with params
-                const params = new URLSearchParams({
-                    roomCode,
-                    nickname
-                });
-
-                let targetPage;
-                if (response.gameMode === 'CONQUEST') {
-                    targetPage = '/conquest-player.html';
-                } else {
-                    targetPage = '/player-reflex.html';
-                }
-
-                window.location.href = `${targetPage}?${params.toString()}`;
-            });
-        }
-
-        // Allow Enter key
-        document.getElementById('nickname').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') joinRoom();
-        });
-        document.getElementById('roomCode').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('nickname').focus();
-            }
-        });
-    </script>
+    <script src="/js/player.js"></script>
 </body>
 
 </html>
