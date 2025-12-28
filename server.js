@@ -539,9 +539,9 @@ function startConquestRound(roomCode) {
 
   console.log(`Conquest round ${room.currentRound} started in room ${roomCode}`);
 
-  // Auto-end round after 12 seconds
+  // Auto-end round after 14 seconds (12s client duration + 2s buffer for network delay)
   if (room.roundTimer) clearTimeout(room.roundTimer);
-  room.roundTimer = setTimeout(() => endConquestRound(roomCode), 12000);
+  room.roundTimer = setTimeout(() => endConquestRound(roomCode), 14000);
 }
 
 // End conquest round
