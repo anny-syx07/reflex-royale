@@ -4,6 +4,22 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const path = require('path');
 
+// Firebase helpers (optional - graceful fallback)
+let trackPlayer, updatePlayerScore, saveGameResult;
+try {
+  const firebaseHelpers = require('./firebase-helpers');
+  trackPlayer = firebaseHelpers.trackPlayer;
+  updatePlayerScore = firebaseHelpers.updatePlayerScore;
+  saveGameResult = firebaseHelpers.saveGameResult;
+  console.log('🔥 Firebase helpers loaded');
+} catch (error) {
+  // Firebase not available - use no-op functions
+  trackPlayer = async () => { };
+  updatePlayerScore = async () => { };
+  saveGameResult = async () => { };
+  console.log('⚠️  Firebase helpers not available - tracking disabled');
+}
+
 const PORT = process.env.PORT || 3000;
 
 // Serve static files
