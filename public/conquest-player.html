@@ -278,10 +278,18 @@
                 const container = document.getElementById('gridContainer');
                 renderer = new ConquestRenderer(container, grid, { clickable: true });
                 renderer.onCellClick = handleCellClick;
+                renderer.render(); // Only render once on first round
             }
 
+            // Update grid data and individual cells (DON'T re-render everything)
             grid.import(mapState);
-            renderer.render();
+
+            // Update only changed cells to preserve claimed territories
+            for (let x = 0; x < grid.size; x++) {
+                for (let y = 0; y < grid.size; y++) {
+                    renderer.updateCell(x, y);
+                }
+            }
 
             updateAPDisplay();
 
@@ -304,7 +312,7 @@
                 pendingActions.splice(actionIndex, 1);
                 currentAP++;
                 renderer.markPending(x, y, false);
-                
+
                 // Notify server (remove)
                 socket.emit('conquestCellClicked', { roomCode, x, y, action: 'remove' });
             } else {
@@ -314,7 +322,7 @@
                     currentAP--;
                     renderer.markPending(x, y, true);
                     playSound('click');
-                    
+
                     // Notify server (add)
                     socket.emit('conquestCellClicked', { roomCode, x, y, action: 'add' });
                 }
@@ -388,9 +396,13 @@
                 renderer.showConflict(x, y);
             });
 
-            // Update cells
+            // Update cells after conflict animation
             setTimeout(() => {
-                renderer.render();
+                for (let x = 0; x < grid.size; x++) {
+                    for (let y = 0; y < grid.size; y++) {
+                        renderer.updateCell(x, y);
+                    }
+                }
             }, 700);
 
             // Update stats
