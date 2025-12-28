@@ -193,12 +193,17 @@ io.on('connection', (socket) => {
     // Send feedback to player
     socket.emit('responseResult', { correct, points, totalScore: player.score });
 
-    // Update leaderboard
-    const leaderboard = Array.from(room.players.values())
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10);
+    // OPTIMIZATION: Throttle leaderboard updates (max 1 per second per room)
+    if (!room.lastLeaderboardUpdate || Date.now() - room.lastLeaderboardUpdate > 1000) {
+      room.lastLeaderboardUpdate = Date.now();
 
-    io.to(roomCode).emit('leaderboardUpdate', { leaderboard });
+      const leaderboard = Array.from(room.players.values())
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10)
+        .map(p => ({ id: p.id, nickname: p.nickname, score: p.score })); // Only send needed data
+
+      io.to(roomCode).emit('leaderboardUpdate', { leaderboard });
+    }
   });
 
   // Shake count update
@@ -219,14 +224,19 @@ io.on('connection', (socket) => {
       timestamp: Date.now()
     });
 
-    // Calculate total shakes for energy bar
-    let totalShakes = 0;
-    room.responses.forEach(response => {
-      totalShakes += response.shakeCount || 0;
-    });
+    // OPTIMIZATION: Throttle energy bar updates (max 10 per second)
+    if (!room.lastEnergyUpdate || Date.now() - room.lastEnergyUpdate > 100) {
+      room.lastEnergyUpdate = Date.now();
 
-    // Broadcast energy bar update
-    io.to(roomCode).emit('energyBarUpdate', { totalShakes, maxShakes: room.players.size * 100 });
+      // Calculate total shakes for energy bar
+      let totalShakes = 0;
+      room.responses.forEach(response => {
+        totalShakes += response.shakeCount || 0;
+      });
+
+      // Broadcast energy bar update
+      io.to(roomCode).emit('energyBarUpdate', { totalShakes, maxShakes: room.players.size * 100 });
+    }
   });
 
   // Tap spam update
