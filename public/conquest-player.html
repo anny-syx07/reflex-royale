@@ -365,22 +365,37 @@
 
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
+                    console.log('[Conquest Client] Timer ended - auto submitting');
                     submitActions();
                 }
             }, 1000);
+
+            // Failsafe: Force submit after duration + 1s
+            setTimeout(() => {
+                console.log('[Conquest Client] Failsafe auto-submit triggered');
+                submitActions();
+            }, (seconds + 1) * 1000);
         }
 
         // Submit actions
+        let hasSubmitted = false;
         function submitActions() {
+            if (hasSubmitted) {
+                console.log('[Conquest Client] Already submitted, skipping');
+                return;
+            }
+
             console.log('[Conquest Client] Submitting actions:', pendingActions);
             if (pendingActions.length > 0) {
                 socket.emit('conquestSubmitActions', {
                     roomCode,
                     actions: pendingActions
                 });
+                hasSubmitted = true;
                 console.log('[Conquest Client] Actions sent to server');
             } else {
                 console.log('[Conquest Client] No actions to submit');
+                hasSubmitted = true; // Mark as submitted even if empty
             }
         }
 
