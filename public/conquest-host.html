@@ -329,10 +329,6 @@
                     }
                 }
                 document.getElementById('totalCells').textContent = total;
-
-                // Clear pending indicators after round ends
-                playerPendingCells.clear();
-                document.querySelectorAll('.pending-indicator').forEach(el => el.remove());
             });
 
             socket.on('conquestRoundEnd', () => {
@@ -348,59 +344,63 @@
                 updateLeaderboard(data.finalLeaderboard);
             });
 
-            function nextRound() {
-                socket.emit('conquestNextRound', { roomCode });
-            }
-
-            function startTimer(seconds) {
-                let remaining = seconds;
-                const timerEl = document.getElementById('timer');
-
-                if (timerInterval) clearInterval(timerInterval);
-
-                timerInterval = setInterval(() => {
-                    remaining--;
-                    timerEl.textContent = remaining;
-
-                    if (remaining <= 3) {
-                        timerEl.classList.add('warning');
-                    } else {
-                        timerEl.classList.remove('warning');
-                    }
-
-                    if (remaining <= 0) {
-                        clearInterval(timerInterval);
-                    }
-                }, 1000);
-            }
-
-            function updateLeaderboard(leaderboard) {
-                const container = document.getElementById('leaderboardList');
-                container.innerHTML = '';
-
-                leaderboard.slice(0, 10).forEach((player, index) => {
-                    const item = document.createElement('div');
-                    item.className = `leaderboard-item rank-${index + 1}`;
-
-                    const rankBadge = document.createElement('div');
-                    rankBadge.className = 'rank-badge';
-                    rankBadge.textContent = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
-
-                    const name = document.createElement('div');
-                    name.className = 'player-name';
-                    name.textContent = player.nickname;
-
-                    const score = document.createElement('div');
-                    score.className = 'player-score';
-                    score.textContent = player.territory || 0;
-
-                    item.appendChild(rankBadge);
-                    item.appendChild(name);
-                    item.appendChild(score);
-                    container.appendChild(item);
-                });
-            }
+            // Start round timer
+            startTimer(duration / 1000);
         });
+
+        // Functions in global scope
+        function nextRound() {
+            socket.emit('conquestNextRound', { roomCode });
+        }
+
+        function startTimer(seconds) {
+            let remaining = seconds;
+            const timerEl = document.getElementById('timer');
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                remaining--;
+                timerEl.textContent = remaining;
+
+                if (remaining <= 3) {
+                    timerEl.classList.add('warning');
+                } else {
+                    timerEl.classList.remove('warning');
+                }
+
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+
+        function updateLeaderboard(leaderboard) {
+            const container = document.getElementById('leaderboardList');
+            container.innerHTML = '';
+
+            leaderboard.slice(0, 10).forEach((player, index) => {
+                const item = document.createElement('div');
+                item.className = `leaderboard-item rank-${index + 1}`;
+
+                const rankBadge = document.createElement('div');
+                rankBadge.className = 'rank-badge';
+                rankBadge.textContent = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+
+                const name = document.createElement('div');
+                name.className = 'player-name';
+                name.textContent = player.nickname;
+
+                const score = document.createElement('div');
+                score.className = 'player-score';
+                score.textContent = player.territory || 0;
+
+                item.appendChild(rankBadge);
+                item.appendChild(name);
+                item.appendChild(score);
+                container.appendChild(item);
+            });
+        }
     </script>
 </body>
 
