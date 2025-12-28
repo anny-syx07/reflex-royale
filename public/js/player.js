@@ -344,6 +344,11 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
       </div>
     </div>
   `;
+
+    // Auto-redirect after 3 seconds
+    setTimeout(() => {
+        window.location.href = '/player.html';
+    }, 3000);
 });
 
 // Host disconnected
