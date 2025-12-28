@@ -32,12 +32,11 @@ app.post('/verify-host-password', (req, res) => {
 // Room storage
 const rooms = new Map();
 
-// Generate unique room code
+// Generate unique room code (4 digits)
 function generateRoomCode() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code;
   do {
-    code = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    code = Math.floor(1000 + Math.random() * 9000).toString();
   } while (rooms.has(code));
   return code;
 }

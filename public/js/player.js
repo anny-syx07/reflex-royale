@@ -51,15 +51,10 @@ if (urlRoomCode && urlNickname) {
 // Join room
 joinBtn.addEventListener('click', () => {
     const code = roomCodeInput.value.trim().toUpperCase();
-    const nickname = nicknameInput.value.trim();
+    const nickname = nicknameInput.value.trim() || 'Player' + Math.floor(Math.random() * 1000);
 
-    if (!code || code.length !== 6) {
-        showError('Vui lòng nhập mã phòng 6 ký tự!');
-        return;
-    }
-
-    if (!nickname) {
-        showError('Vui lòng nhập tên của bạn!');
+    if (!code || code.length !== 4) {
+        showError('Vui lòng nhập mã phòng 4 số!');
         return;
     }
 
