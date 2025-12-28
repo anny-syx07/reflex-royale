@@ -152,6 +152,12 @@
             transform: scale(1.1);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
+
+        /* Hide back button during game */
+        #mainDisplay:not([style*="display: none"])~.back-btn,
+        #gameContainer:not([style*="display: none"]) .back-btn {
+            display: none;
+        }
     </style>
 </head>
 
@@ -376,11 +382,7 @@
                 document.getElementById('gameStatus').textContent = '🎉 Trò Chơi Kết Thúc!';
                 document.getElementById('nextBtn').style.display = 'none';
                 updateLeaderboard(data.finalLeaderboard);
-                
-                // Auto-redirect after 3 seconds
-                setTimeout(() => {
-                    window.location.href = '/host.html';
-                }, 3000);
+                // Host controls when to leave - no auto-redirect
             });
 
             // Start round timer

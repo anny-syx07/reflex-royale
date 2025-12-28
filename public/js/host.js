@@ -268,11 +268,7 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
     `;
         finalLeaderboardEl.appendChild(item);
     });
-
-    // Auto-redirect after 3 seconds
-    setTimeout(() => {
-        window.location.href = '/host.html';
-    }, 3000);
+    // Host controls when to leave - no auto-redirect
 });
 
 // New game
