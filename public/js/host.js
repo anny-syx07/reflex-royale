@@ -268,11 +268,16 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
     `;
         finalLeaderboardEl.appendChild(item);
     });
+
+    // Auto-redirect after 3 seconds
+    setTimeout(() => {
+        window.location.href = '/host.html';
+    }, 3000);
 });
 
 // New game
 newGameBtn.addEventListener('click', () => {
-    location.reload();
+    window.location.href = '/host.html';
 });
 
 // Host disconnected

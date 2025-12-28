@@ -7,9 +7,35 @@
   <title>Reflex Royale - Host</title>
   <link rel="stylesheet" href="/css/shared.css">
   <link rel="stylesheet" href="/css/host.css">
+  <style>
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
 
 <body>
+  <button class="back-btn" onclick="window.location.href='/host.html'" title="Quay lại">⬅️</button>
   <!-- Waiting Room Screen -->
   <div id="waitingScreen" class="screen">
     <div class="container">
