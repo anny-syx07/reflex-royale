@@ -305,17 +305,20 @@
         socket.on('conquestMapUpdate', (data) => {
             const { grid: gridData, leaderboard, conflictsThisRound } = data;
 
+            // Update grid data
             grid.grid = gridData;
+
+            // Update only changed cells instead of full re-render
+            for (let x = 0; x < grid.size; x++) {
+                for (let y = 0; y < grid.size; y++) {
+                    renderer.updateCell(x, y);
+                }
+            }
 
             // Show conflicts
             conflictsThisRound.forEach(({ x, y }) => {
                 renderer.showConflict(x, y);
             });
-
-            // Update map after conflict animation
-            setTimeout(() => {
-                renderer.render();
-            }, 700);
 
             // Update leaderboard
             updateLeaderboard(leaderboard);
@@ -328,6 +331,10 @@
                 }
             }
             document.getElementById('totalCells').textContent = total;
+
+            // Clear pending indicators after round ends
+            playerPendingCells.clear();
+            document.querySelectorAll('.pending-indicator').forEach(el => el.remove());
         });
 
         socket.on('conquestRoundEnd', () => {
