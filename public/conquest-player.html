@@ -227,6 +227,7 @@
         let maxAP = 3;
         let pendingActions = [];
         let timerInterval = null;
+        let failsafeTimeout = null; // Track failsafe timer
 
         // Auto-join from URL params
         const urlParams = new URLSearchParams(window.location.search);
@@ -273,6 +274,10 @@
             pendingActions = [];
             hasSubmitted = false; // Reset for new round
 
+            // Clear any existing timers
+            if (timerInterval) clearInterval(timerInterval);
+            if (failsafeTimeout) clearTimeout(failsafeTimeout);
+
             // Initialize or update grid
             if (!grid) {
                 grid = new ConquestGrid(10);
@@ -313,9 +318,7 @@
                 pendingActions.splice(actionIndex, 1);
                 currentAP++;
                 renderer.markPending(x, y, false);
-
-                // Notify server (remove)
-                socket.emit('conquestCellClicked', { roomCode, x, y, action: 'remove' });
+                // Real-time indicators disabled
             } else {
                 // Add action
                 if (currentAP > 0) {
@@ -323,9 +326,7 @@
                     currentAP--;
                     renderer.markPending(x, y, true);
                     playSound('click');
-
-                    // Notify server (add)
-                    socket.emit('conquestCellClicked', { roomCode, x, y, action: 'add' });
+                    // Real-time indicators disabled
                 }
             }
 
@@ -372,7 +373,8 @@
             }, 1000);
 
             // Failsafe: Force submit after duration + 1s
-            setTimeout(() => {
+            if (failsafeTimeout) clearTimeout(failsafeTimeout);
+            failsafeTimeout = setTimeout(() => {
                 console.log('[Conquest Client] Failsafe auto-submit triggered');
                 submitActions();
             }, (seconds + 1) * 1000);
