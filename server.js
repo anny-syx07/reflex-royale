@@ -111,6 +111,15 @@ io.on('connection', (socket) => {
 
   // Player joins a room
   socket.on('joinRoom', ({ roomCode, nickname }) => {
+    // CLEANUP: Leave all previous rooms before joining new one
+    const currentRooms = Array.from(socket.rooms);
+    currentRooms.forEach(room => {
+      if (room !== socket.id) { // Keep socket's own room
+        socket.leave(room);
+        console.log(`[Cleanup] Socket ${socket.id} left old room ${room}`);
+      }
+    });
+
     const room = rooms.get(roomCode);
 
     if (!room) {
@@ -314,6 +323,15 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinConquestRoom', ({ roomCode, nickname }) => {
+    // CLEANUP: Leave all previous rooms before joining new one
+    const currentRooms = Array.from(socket.rooms);
+    currentRooms.forEach(room => {
+      if (room !== socket.id) { // Keep socket's own room
+        socket.leave(room);
+        console.log(`[Cleanup] Socket ${socket.id} left old room ${room}`);
+      }
+    });
+
     const room = rooms.get(roomCode);
     if (!room || room.gameMode !== 'CONQUEST') {
       socket.emit('error', { message: 'Phòng không tồn tại!' });
