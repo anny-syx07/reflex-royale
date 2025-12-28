@@ -127,10 +127,37 @@
         .waiting-screen.hidden {
             display: none;
         }
+
+        /* Floating Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 
 <body>
+    <!-- Floating Back Button -->
+    <button class="back-btn" onclick="window.location.href='/host.html'" title="Quay lại">⬅️</button>
     <!-- Waiting Screen -->
     <div class="waiting-screen" id="waitingScreen">
         <h1 style="font-size: 64px; margin-bottom: 30px;">🏛️ Đại Chiến Giảng Đường</h1>
@@ -164,6 +191,11 @@
                 <button class="btn btn-primary" id="startBtn" onclick="startGame()">Bắt Đầu Trò Chơi</button>
                 <button class="btn btn-secondary" id="nextBtn" onclick="nextRound()" style="display: none;">Vòng Tiếp
                     Theo</button>
+                <br>
+                <button class="btn btn-secondary" onclick="location.reload()" style="margin-top: 15px;">🔄 Phòng
+                    Mới</button>
+                <button class="btn btn-secondary" onclick="window.location.href='/host.html'"
+                    style="margin-top: 15px;">⬅️ Quay Lại</button>
             </div>
         </div>
     </div>
