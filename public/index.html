@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reflex Royale - Trò Chơi Phản Xạ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      padding: 40px;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #667eea;
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 20px;
+      margin: 15px 0;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: white;
+    }
+
+    .btn-host {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .btn-host:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(240, 147, 251, 0.4);
+    }
+
+    .btn-join {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .btn-join:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+    }
+
+    .btn-icon {
+      margin-right: 10px;
+      font-size: 24px;
+    }
+
+    .info {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* Password Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 400px;
+      width: 90%;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-content h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+
+    .modal-content input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .modal-btn-confirm {
+      background: #667eea;
+      color: white;
+    }
+
+    .modal-btn-confirm:hover {
+      background: #5568d3;
+    }
+
+    .modal-btn-cancel {
+      background: #e0e0e0;
+      color: #666;
+    }
+
+    .modal-btn-cancel:hover {
+      background: #d0d0d0;
+    }
+
+    .error {
+      color: #f5576c;
+      font-size: 14px;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .btn {
+        padding: 15px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo">⚡🎮⚡</div>
+    <h1>Reflex Royale</h1>
+    <p class="subtitle">Trò Chơi Kiểm Tra Phản Xạ</p>
+
+    <button class="btn btn-host" onclick="showPasswordModal()">
+      <span class="btn-icon">🖥️</span>
+      Tạo Phòng (Host)
+    </button>
+
+    <a href="/player.html" class="btn btn-join">
+      <span class="btn-icon">📱</span>
+      Tham Gia Phòng (Player)
+    </a>
+
+    <div class="info">
+      <strong>📱 Cách Chơi:</strong><br>
+      • <strong>Host:</strong> Tạo phòng và quản lý trò chơi<br>
+      • <strong>Player:</strong> Tham gia phòng với mã code và chơi trên điện thoại
+    </div>
+  </div>
+
+  <!-- Password Modal -->
+  <div class="modal" id="passwordModal">
+    <div class="modal-content">
+      <h2>🔒 Xác Thực Host</h2>
+      <p style="color: #666; margin-bottom: 20px;">Nhập mật khẩu để tạo phòng</p>
+
+      <div class="error" id="errorMsg">❌ Mật khẩu không đúng!</div>
+
+      <input type="password" id="passwordInput" placeholder="Nhập mật khẩu..." onkeypress="handleKeyPress(event)">
+
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closePasswordModal()">
+          Hủy
+        </button>
+        <button class="modal-btn modal-btn-confirm" onclick="verifyPassword()">
+          Xác Nhận
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showPasswordModal() {
+      const modal = document.getElementById('passwordModal');
+      const input = document.getElementById('passwordInput');
+      const error = document.getElementById('errorMsg');
+
+      modal.classList.add('active');
+      error.classList.remove('show');
+      input.value = '';
+
+      setTimeout(() => input.focus(), 100);
+    }
+
+    function closePasswordModal() {
+      const modal = document.getElementById('passwordModal');
+      modal.classList.remove('active');
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        verifyPassword();
+      }
+    }
+
+    async function verifyPassword() {
+      const password = document.getElementById('passwordInput').value;
+      const error = document.getElementById('errorMsg');
+
+      if (!password) {
+        error.textContent = '❌ Vui lòng nhập mật khẩu!';
+        error.classList.add('show');
+        return;
+      }
+
+      try {
+        const response = await fetch('/verify-host-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Store auth token
+          sessionStorage.setItem('hostAuth', 'true');
+          // Redirect to host page
+          window.location.href = '/host.html';
+        } else {
+          error.textContent = '❌ Mật khẩu không đúng!';
+          error.classList.add('show');
+          document.getElementById('passwordInput').value = '';
+          document.getElementById('passwordInput').focus();
+        }
+      } catch (err) {
+        error.textContent = '❌ Lỗi kết nối! Thử lại sau.';
+        error.classList.add('show');
+      }
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('passwordModal').addEventListener('click', (e) => {
+      if (e.target.id === 'passwordModal') {
+        closePasswordModal();
+      }
+    });
+  </script>
+</body>
+
+</html>

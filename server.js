@@ -8,10 +8,25 @@ const PORT = process.env.PORT || 3000;
 
 // Serve static files
 app.use(express.static('public'));
+app.use(express.json());
 
-// Root route - redirect to host page
+// Host password (change this to your desired password)
+const HOST_PASSWORD = process.env.HOST_PASSWORD || 'reflex2025';
+
+// Root route - serve landing page
 app.get('/', (req, res) => {
-  res.redirect('/host.html');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Password verification endpoint
+app.post('/verify-host-password', (req, res) => {
+  const { password } = req.body;
+
+  if (password === HOST_PASSWORD) {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false });
+  }
 });
 
 // Room storage
