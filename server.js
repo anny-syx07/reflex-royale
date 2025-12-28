@@ -107,6 +107,13 @@ io.on('connection', (socket) => {
       return;
     }
 
+    // UNIQUE NICKNAME CHECK
+    const existingNickname = Array.from(room.players.values()).find(p => p.nickname === nickname);
+    if (existingNickname) {
+      socket.emit('error', { message: `Tên "${nickname}" đã được sử dụng! Vui lòng chọn tên khác.` });
+      return;
+    }
+
     const player = {
       id: socket.id,
       nickname: nickname || `Player${room.players.size + 1}`,
@@ -300,6 +307,14 @@ io.on('connection', (socket) => {
       socket.emit('error', { message: 'Trò chơi đã bắt đầu!' });
       return;
     }
+
+    // UNIQUE NICKNAME CHECK
+    const existingPlayer = Array.from(room.players.values()).find(p => p.nickname === nickname);
+    if (existingPlayer) {
+      socket.emit('error', { message: `Tên "${nickname}" đã được sử dụng! Vui lòng chọn tên khác.` });
+      return;
+    }
+
     const player = {
       id: socket.id,
       nickname: nickname || `Player${room.players.size + 1}`,

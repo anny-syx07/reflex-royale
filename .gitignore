@@ -16,3 +16,5 @@ yarn-error.log*
 # Editor
 .vscode/
 .idea/
+firebase-service-account.json
+.env
