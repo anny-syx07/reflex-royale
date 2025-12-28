@@ -9,6 +9,11 @@ const PORT = process.env.PORT || 3000;
 // Serve static files
 app.use(express.static('public'));
 
+// Root route - redirect to host page
+app.get('/', (req, res) => {
+  res.redirect('/host.html');
+});
+
 // Room storage
 const rooms = new Map();
 
