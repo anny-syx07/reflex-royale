@@ -376,6 +376,11 @@
                 document.getElementById('gameStatus').textContent = '🎉 Trò Chơi Kết Thúc!';
                 document.getElementById('nextBtn').style.display = 'none';
                 updateLeaderboard(data.finalLeaderboard);
+                
+                // Auto-redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = '/host.html';
+                }, 3000);
             });
 
             // Start round timer

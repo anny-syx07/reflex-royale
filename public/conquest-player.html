@@ -461,6 +461,11 @@
             document.getElementById('finalRank').textContent = `#${yourRank}`;
             document.getElementById('finalScore').textContent = `${yourTerritory} territories`;
             document.getElementById('gameOverScreen').classList.add('show');
+
+            // Auto-redirect after 3 seconds
+            setTimeout(() => {
+                window.location.href = '/player.html';
+            }, 3000);
         });
 
         // Socket: Error
