@@ -373,13 +373,11 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
     gameScreen.appendChild(container);
 });
 
-// Host disconnected
+// Host disconnected - player stays on screen, uses 'Chơi Lại' button when ready
 socket.on('hostDisconnected', () => {
-    alert('Host đã ngắt kết nối!');
-    cleanupSocket();
-    // Clear URL params to prevent auto-rejoin, then redirect
-    window.history.replaceState({}, document.title, '/player.html');
-    window.location.href = '/player.html';
+    console.log('Host disconnected - player stays on results screen');
+    // Do nothing - player is independent
+    // They will click 'Chơi Lại' when ready
 });
 
 // Cleanup function - called before leaving page
