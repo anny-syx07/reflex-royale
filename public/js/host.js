@@ -6,6 +6,13 @@ let roundTimer = null;
 let globalTimer = null;
 let roundTimeLeft = 0;
 
+// Game state
+const gameState = {
+    phase: 'WAITING',
+    roundNumber: 0,
+    totalRounds: 7
+};
+
 // DOM Elements
 const waitingScreen = document.getElementById('waitingScreen');
 const gameScreen = document.getElementById('gameScreen');
@@ -273,11 +280,30 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
 
 // New game
 newGameBtn.addEventListener('click', () => {
+    cleanupHost();
     window.location.href = '/host.html';
 });
 
 // Host disconnected
 socket.on('hostDisconnected', () => {
     alert('Host đã ngắt kết nối!');
+    cleanupHost();
     location.reload();
 });
+
+// Cleanup function
+function cleanupHost() {
+    // Clear all timers
+    if (globalTimer) clearInterval(globalTimer);
+    if (roundTimer) clearInterval(roundTimer);
+    globalTimer = null;
+    roundTimer = null;
+
+    // Remove socket listeners
+    if (socket) {
+        socket.removeAllListeners();
+    }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', cleanupHost);

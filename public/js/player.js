@@ -332,27 +332,59 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
     const playerRank = finalLeaderboard.findIndex(p => p.id === playerId) + 1;
     const totalPlayers = finalLeaderboard.length;
 
-    gameScreen.innerHTML = `
-    <div class="container">
-      <h1 class="game-title text-gradient">🎉 HOÀN THÀNH! 🎉</h1>
-      <div class="glass" style="padding: 2rem; border-radius: 1rem; text-align: center;">
-        <h2 style="font-size: 3rem; color: var(--color-yellow); margin-bottom: 1rem;">
-          #${playerRank} / ${totalPlayers}
-        </h2>
-        <p style="font-size: 1.5rem; color: var(--text-secondary);">
-          Tổng điểm: <strong style="color: var(--color-yellow);">${currentScore}</strong>
-        </p>
-        <button class="btn btn-primary btn-lg" onclick="window.location.href='/player.html'" style="margin-top: 2rem;">
-          🎮 CHƠI LẠI
-        </button>
-      </div>
-    </div>
-  `;
-    // No auto-redirect - player clicks button
+    // Create game over UI using DOM (not innerHTML for better performance)
+    const container = document.createElement('div');
+    container.className = 'container';
+
+    const title = document.createElement('h1');
+    title.className = 'game-title text-gradient';
+    title.textContent = '🎉 HOÀN THÀNH! 🎉';
+
+    const glass = document.createElement('div');
+    glass.className = 'glass';
+    glass.style.cssText = 'padding: 2rem; border-radius: 1rem; text-align: center;';
+
+    const rankDisplay = document.createElement('h2');
+    rankDisplay.style.cssText = 'font-size: 3rem; color: var(--color-yellow); margin-bottom: 1rem;';
+    rankDisplay.textContent = `#${playerRank} / ${totalPlayers}`;
+
+    const scoreDisplay = document.createElement('p');
+    scoreDisplay.style.cssText = 'font-size: 1.5rem; color: var(--text-secondary);';
+    scoreDisplay.innerHTML = `Tổng điểm: <strong style="color: var(--color-yellow);">${currentScore}</strong>`;
+
+    const playAgainBtn = document.createElement('button');
+    playAgainBtn.className = 'btn btn-primary btn-lg';
+    playAgainBtn.textContent = '🎮 CHƠI LẠI';
+    playAgainBtn.style.marginTop = '2rem';
+    playAgainBtn.onclick = () => {
+        cleanupSocket();
+        window.location.href = '/player.html';
+    };
+
+    glass.appendChild(rankDisplay);
+    glass.appendChild(scoreDisplay);
+    glass.appendChild(playAgainBtn);
+    container.appendChild(title);
+    container.appendChild(glass);
+
+    gameScreen.innerHTML = '';
+    gameScreen.appendChild(container);
 });
 
 // Host disconnected
 socket.on('hostDisconnected', () => {
     alert('Host đã ngắt kết nối!');
+    cleanupSocket();
     location.reload();
 });
+
+// Cleanup function - called before leaving page
+function cleanupSocket() {
+    if (socket) {
+        socket.removeAllListeners();
+    }
+    document.body.classList.remove('in-game');
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', cleanupSocket);
