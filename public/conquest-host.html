@@ -154,9 +154,9 @@
         }
 
         /* Hide back button during game */
-        #mainDisplay:not([style*="display: none"])~.back-btn,
-        #gameContainer:not([style*="display: none"]) .back-btn {
-            display: none;
+        #mainDisplay:not([style*="display: none"]) .back-btn,
+        #sidebar:not([style*="display: none"])~.back-btn {
+            display: none !important;
         }
     </style>
 </head>
