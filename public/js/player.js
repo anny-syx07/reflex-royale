@@ -81,9 +81,10 @@ function showError(message) {
 socket.on('joinedRoom', ({ roomCode: code, playerId: id }) => {
     roomCode = code;
     playerId = id;
-    console.log('Joined room:', roomCode);
     document.body.classList.add('in-game'); // Hide back button
-    showScreen('waiting');
+    joinScreen.classList.add('hidden');
+    waitingScreen.classList.remove('hidden');
+    console.log('Joined room:', code);
 });
 
 // Error joining
@@ -93,7 +94,8 @@ socket.on('error', ({ message }) => {
 
 // Game started
 socket.on('gameStarted', () => {
-    showScreen('game');
+    waitingScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
 });
 
 // Round start
