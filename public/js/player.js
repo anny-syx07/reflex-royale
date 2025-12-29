@@ -358,6 +358,8 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
     playAgainBtn.style.marginTop = '2rem';
     playAgainBtn.onclick = () => {
         cleanupSocket();
+        // Clear URL to prevent auto-rejoin
+        window.history.replaceState({}, document.title, '/player.html');
         window.location.href = '/player.html';
     };
 
@@ -375,7 +377,9 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
 socket.on('hostDisconnected', () => {
     alert('Host đã ngắt kết nối!');
     cleanupSocket();
-    window.location.href = '/player.html'; // Go to clean join page, not reload old URL
+    // Clear URL params to prevent auto-rejoin, then redirect
+    window.history.replaceState({}, document.title, '/player.html');
+    window.location.href = '/player.html';
 });
 
 // Cleanup function - called before leaving page
