@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>REFLEX ROYALE - Hướng Dẫn Sử Dụng</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #1a73e8;
+            text-align: center;
+        }
+
+        h2 {
+            color: #202124;
+            border-bottom: 2px solid #1a73e8;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #5f6368;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #dadce0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .info-box {
+            background-color: #e8f0fe;
+            border-left: 4px solid #1a73e8;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background-color: #fef7e0;
+            border-left: 4px solid #fbbc04;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        code {
+            background-color: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            margin: 20px 0;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+
+        .screenshot-caption {
+            text-align: center;
+            color: #5f6368;
+            font-style: italic;
+            margin-top: -5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎮 REFLEX ROYALE - Hướng Dẫn Sử Dụng Đầy Đủ</h1>
+
+    <div class="info-box">
+        <strong>Phiên bản:</strong> 1.0 | <strong>Cập nhật:</strong> 29/12/2025<br>
+        <strong>Dành cho:</strong> Giảng viên, sinh viên và quản lý sự kiện
+    </div>
+
+    <h2>📋 Mục Lục</h2>
+    <ol>
+        <li>Giới Thiệu Game</li>
+        <li>Yêu Cầu Hệ Thống</li>
+        <li>Hướng Dẫn Truy Cập</li>
+        <li>Chế Độ Game</li>
+        <li>Hướng Dẫn Cho Host (Người Tổ Chức)</li>
+        <li>Hướng Dẫn Cho Player (Người Chơi)</li>
+        <li>Chi Tiết Các Vòng Chơi</li>
+        <li>Cách Tính Điểm</li>
+        <li>Xử Lý Sự Cố</li>
+        <li>Câu Hỏi Thường Gặp</li>
+    </ol>
+
+    <hr>
+
+    <h2>📸 Hình Ảnh & Video Minh Họa</h2>
+
+    <h3>🏠 Trang Chủ</h3>
+    <img src="landing_page.png" alt="Trang chủ Reflex Royale">
+    <p class="screenshot-caption">Trang chủ Reflex Royale với 2 nút chọn chế độ game: Reflex Battle và Campus Conquest
+    </p>
+
+    <h3>🎬 Video Demo: Tour Trang Chủ</h3>
+    <div class="video-container">
+        <iframe src="https://drive.google.com/file/d/14RR4qr1kkQVkRNDMPiBC2IAUH85UnOH_/preview"
+            allow="autoplay"></iframe>
+    </div>
+
+    <h3>🔐 Màn Hình Đăng Nhập Host</h3>
+    <img src="host_password_screen.png" alt="Màn hình nhập mật khẩu Host">
+    <p class="screenshot-caption">Màn hình nhập mật khẩu để trở thành Host - Mật khẩu mặc định: WelcometoUMT</p>
+
+    <h3>⏳ Phòng Chờ Host (Reflex Battle)</h3>
+    <img src="reflex_waiting_room.png" alt="Phòng chờ Host với mã phòng">
+    <p class="screenshot-caption">Phòng chờ Host hiển thị mã phòng 4 số và danh sách người chơi đang chờ</p>
+
+    <h3>🎬 Video Demo: Luồng Tạo Phòng Host</h3>
+    <div class="video-container">
+        <iframe src="https://drive.google.com/file/d/1EV-S70DWlWYXc5zIXjADtlsiYhuN5_sE/preview"
+            allow="autoplay"></iframe>
+    </div>
+
+    <h3>📱 Màn Hình Tham Gia (Player)</h3>
+    <img src="player_join_screen.png" alt="Màn hình nhập mã phòng Player">
+    <p class="screenshot-caption">Màn hình Player nhập tên và mã phòng 4 số để tham gia game</p>
+
+    <h3>⏳ Phòng Chờ Player</h3>
+    <img src="player_waiting_screen.png" alt="Màn hình chờ Player">
+    <p class="screenshot-caption">Màn hình chờ sau khi Player tham gia phòng thành công - Đợi Host bắt đầu</p>
+
+    <h3>🎬 Video Demo: Luồng Tham Gia Player</h3>
+    <div class="video-container">
+        <iframe src="https://drive.google.com/file/d/1JIch1Y5LmwjqR8br_KAaavGAV6Tz_MvG/preview"
+            allow="autoplay"></iframe>
+    </div>
+
+    <hr>
+
+    <h2>1. Giới Thiệu Game</h2>
+
+    <p><strong>Reflex Royale</strong> là game tương tác thời gian thực được thiết kế cho các sự kiện, lớp học và hoạt
+        động nhóm. Game có 2 chế độ chính:</p>
+
+    <table>
+        <tr>
+            <th>Chế Độ</th>
+            <th>Mô Tả</th>
+            <th>Số Người Chơi</th>
+            <th>Thời Gian</th>
+        </tr>
+        <tr>
+            <td><strong>🎯 Reflex Battle</strong></td>
+            <td>Thi đấu phản xạ nhanh</td>
+            <td>2-100+ người</td>
+            <td>~5 phút</td>
+        </tr>
+        <tr>
+            <td><strong>🗺️ Campus Conquest</strong></td>
+            <td>Chiến thuật chiếm lãnh thổ</td>
+            <td>2-50 người</td>
+            <td>~10 phút</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2>2. Yêu Cầu Hệ Thống</h2>
+
+    <h3>Thiết Bị Hỗ Trợ</h3>
+    <ul>
+        <li>✅ Smartphone (iOS/Android)</li>
+        <li>✅ Tablet</li>
+        <li>✅ Laptop/PC</li>
+        <li>✅ Trình duyệt: Chrome, Safari, Firefox, Edge</li>
+    </ul>
+
+    <h3>Yêu Cầu Mạng</h3>
+    <ul>
+        <li>Kết nối Internet ổn định (WiFi hoặc 4G/5G)</li>
+        <li>Tốc độ tối thiểu: 1 Mbps</li>
+    </ul>
+
+    <hr>
+
+    <h2>3. Hướng Dẫn Truy Cập</h2>
+
+    <div class="info-box">
+        <strong>🌐 Link Game:</strong><br>
+        <code>https://reflex-royale-production.up.railway.app/</code>
+    </div>
+
+    <h3>Các Trang Chính</h3>
+    <table>
+        <tr>
+            <th>Trang</th>
+            <th>Đường dẫn</th>
+            <th>Dành cho</th>
+        </tr>
+        <tr>
+            <td>Trang chủ</td>
+            <td><code>/</code></td>
+            <td>Tất cả</td>
+        </tr>
+        <tr>
+            <td>Host Reflex</td>
+            <td><code>/host.html</code></td>
+            <td>Người tổ chức</td>
+        </tr>
+        <tr>
+            <td>Host Conquest</td>
+            <td><code>/conquest-host.html</code></td>
+            <td>Người tổ chức</td>
+        </tr>
+        <tr>
+            <td>Player</td>
+            <td><code>/player.html</code></td>
+            <td>Người chơi</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2>4. Chế Độ Game</h2>
+
+    <h3>🎯 Chế Độ 1: REFLEX BATTLE</h3>
+    <p><strong>Mục tiêu:</strong> Phản xạ nhanh nhất để giành điểm cao</p>
+    <p><strong>Gồm 4 vòng:</strong></p>
+    <ol>
+        <li><strong>Chạm Đúng Màu</strong> - Nhấn nút đúng màu được yêu cầu</li>
+        <li><strong>Vuốt Đúng Hướng</strong> - Vuốt theo hướng mũi tên</li>
+        <li><strong>Lắc Điên Cuồng</strong> - Lắc điện thoại thật mạnh (10 giây)</li>
+        <li><strong>Chạm Liên Hoàn</strong> - Nhấn nhanh nhất có thể (10 giây)</li>
+    </ol>
+
+    <h3>🗺️ Chế Độ 2: CAMPUS CONQUEST</h3>
+    <p><strong>Mục tiêu:</strong> Chiếm được nhiều ô đất nhất trên bản đồ 10x10</p>
+    <p><strong>Cơ chế:</strong></p>
+    <ul>
+        <li>Mỗi vòng có <strong>3 điểm hành động (AP)</strong></li>
+        <li>Chọn tối đa 3 ô để chiếm</li>
+        <li>Nếu nhiều người chọn cùng 1 ô → <strong>Xung đột</strong> → Không ai được</li>
+        <li>Có các ô đặc biệt với <strong>x2</strong>, <strong>x3</strong> điểm</li>
+    </ul>
+
+    <hr>
+
+    <h2>5. Hướng Dẫn Cho Host</h2>
+
+    <h3>Bước 1: Tạo Phòng</h3>
+    <ol>
+        <li>Truy cập trang Host (<code>/host.html</code> hoặc <code>/conquest-host.html</code>)</li>
+        <li>Nhập mật khẩu Host: <code>WelcometoUMT</code></li>
+        <li>Nhấn <strong>"Tạo Phòng"</strong></li>
+        <li>Nhận mã phòng 4 chữ số (VD: <code>2898</code>)</li>
+    </ol>
+
+    <h3>Bước 2: Chia Sẻ Mã Phòng</h3>
+    <ul>
+        <li>Hiển thị mã phòng lên màn hình lớn</li>
+        <li>Hoặc đọc to cho người chơi</li>
+    </ul>
+
+    <h3>Bước 3: Chờ Người Chơi</h3>
+    <ul>
+        <li>Theo dõi danh sách người chơi tham gia</li>
+        <li>Đợi đủ người rồi nhấn <strong>"Bắt Đầu"</strong></li>
+    </ul>
+
+    <h3>Bước 4: Điều Khiển Game</h3>
+    <table>
+        <tr>
+            <th>Nút</th>
+            <th>Chức Năng</th>
+        </tr>
+        <tr>
+            <td><strong>Bắt Đầu</strong></td>
+            <td>Khởi động game</td>
+        </tr>
+        <tr>
+            <td><strong>Vòng Tiếp</strong></td>
+            <td>Chuyển sang vòng mới</td>
+        </tr>
+        <tr>
+            <td><strong>Chơi Lại</strong></td>
+            <td>Bắt đầu game mới</td>
+        </tr>
+        <tr>
+            <td><strong>← Quay Lại</strong></td>
+            <td>Về trang chủ</td>
+        </tr>
+    </table>
+
+    <div class="warning-box">
+        <strong>🔐 Mật Khẩu Host:</strong> <code>WelcometoUMT</code>
+    </div>
+
+    <hr>
+
+    <h2>6. Hướng Dẫn Cho Player</h2>
+
+    <h3>Bước 1: Truy Cập Game</h3>
+    <ol>
+        <li>Mở trình duyệt trên điện thoại</li>
+        <li>Vào link: <code>https://reflex-royale-production.up.railway.app/player.html</code></li>
+        <li>Hoặc vào trang chủ → Chọn <strong>"Tham Gia Game"</strong></li>
+    </ol>
+
+    <h3>Bước 2: Nhập Thông Tin</h3>
+    <ol>
+        <li><strong>Nhập tên</strong> của bạn (nickname)</li>
+        <li><strong>Nhập mã phòng</strong> 4 số mà Host đưa</li>
+        <li>Nhấn <strong>"Vào Phòng"</strong></li>
+    </ol>
+
+    <h3>Bước 3: Chờ & Chơi</h3>
+    <ul>
+        <li>Đợi Host bắt đầu game</li>
+        <li>Làm theo hướng dẫn trên màn hình</li>
+    </ul>
+
+    <h3>Điều Khiển Player</h3>
+    <table>
+        <tr>
+            <th>Hành Động</th>
+            <th>Cách Làm</th>
+        </tr>
+        <tr>
+            <td>Chạm màu</td>
+            <td>Nhấn vào nút màu đúng</td>
+        </tr>
+        <tr>
+            <td>Vuốt hướng</td>
+            <td>Vuốt theo mũi tên</td>
+        </tr>
+        <tr>
+            <td>Lắc</td>
+            <td>Lắc điện thoại mạnh</td>
+        </tr>
+        <tr>
+            <td>Chạm liên hoàn</td>
+            <td>Nhấn nút liên tục thật nhanh</td>
+        </tr>
+        <tr>
+            <td>Chọn ô (Conquest)</td>
+            <td>Nhấn vào ô trên bản đồ</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2>7. Chi Tiết Các Vòng Chơi</h2>
+
+    <h3>🔴🔵🟡🟣 Vòng 1: Chạm Đúng Màu</h3>
+    <p><strong>Cách chơi:</strong></p>
+    <ol>
+        <li>Màn hình hiển thị tên màu (VD: "ĐỎ", "XANH")</li>
+        <li>Nhấn nút màu tương ứng thật nhanh</li>
+        <li>Đúng = +điểm | Sai = -200 điểm</li>
+    </ol>
+    <p><strong>Màu có trong game:</strong> 🔴 ĐỎ | 🔵 XANH | 🟡 VÀNG | 🟣 TÍM</p>
+
+    <h3>⬆️⬇️⬅️➡️ Vòng 2: Vuốt Đúng Hướng</h3>
+    <p><strong>Cách chơi:</strong></p>
+    <ol>
+        <li>Mũi tên hiện lên (LÊN/XUỐNG/TRÁI/PHẢI)</li>
+        <li>Vuốt ngón tay theo hướng đó</li>
+        <li>Đúng = +điểm | Sai = -200 điểm</li>
+    </ol>
+
+    <h3>📱 Vòng 3: Lắc Điên Cuồng</h3>
+    <p><strong>Cách chơi:</strong></p>
+    <ol>
+        <li>Thời gian: 10 giây</li>
+        <li>Lắc điện thoại mạnh và nhanh nhất có thể</li>
+        <li>Số lần lắc được ghi nhận</li>
+        <li>Top 3 được thưởng điểm bonus</li>
+    </ol>
+    <div class="warning-box">
+        <strong>⚠️ Lưu ý:</strong> Cầm chắc điện thoại, đừng để rơi!
+    </div>
+
+    <h3>👆👆👆 Vòng 4: Chạm Liên Hoàn</h3>
+    <p><strong>Cách chơi:</strong></p>
+    <ol>
+        <li>Thời gian: 10 giây</li>
+        <li>Nhấn vào nút trên màn hình thật nhanh</li>
+        <li>Mỗi lần chạm = +5 điểm</li>
+        <li>Top 3 được thưởng điểm bonus</li>
+    </ol>
+
+    <h3>🗺️ Campus Conquest - Chi Tiết</h3>
+    <p><strong>Mỗi vòng:</strong></p>
+    <ol>
+        <li>Bạn có <strong>3 AP</strong> (điểm hành động)</li>
+        <li>Chọn tối đa 3 ô trên bản đồ</li>
+        <li>Hết thời gian → Xử lý xung đột</li>
+        <li>Ô không ai tranh = Bạn được</li>
+        <li>Nhiều người tranh = Không ai được</li>
+    </ol>
+
+    <table>
+        <tr>
+            <th>Loại Ô</th>
+            <th>Điểm</th>
+            <th>Màu</th>
+        </tr>
+        <tr>
+            <td>Thường</td>
+            <td>x1</td>
+            <td>Xám</td>
+        </tr>
+        <tr>
+            <td>Quan trọng</td>
+            <td>x2</td>
+            <td>Vàng ⭐</td>
+        </tr>
+        <tr>
+            <td>Chiến lược</td>
+            <td>x3</td>
+            <td>Vàng sáng ⭐⭐</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2>8. Cách Tính Điểm</h2>
+
+    <h3>Reflex Battle</h3>
+    <table>
+        <tr>
+            <th>Vòng</th>
+            <th>Đúng</th>
+            <th>Sai</th>
+            <th>Bonus Top 3</th>
+        </tr>
+        <tr>
+            <td>Chạm Màu</td>
+            <td>100-1000 (theo tốc độ)</td>
+            <td>-200</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Vuốt Hướng</td>
+            <td>100-1000 (theo tốc độ)</td>
+            <td>-200</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Lắc</td>
+            <td>10 điểm/lần lắc</td>
+            <td>-</td>
+            <td>+500/+300/+100</td>
+        </tr>
+        <tr>
+            <td>Chạm</td>
+            <td>5 điểm/lần chạm</td>
+            <td>-</td>
+            <td>+500/+300/+100</td>
+        </tr>
+    </table>
+
+    <div class="info-box">
+        <strong>📊 Công thức điểm phản xạ:</strong><br>
+        <code>Điểm = max(100, 1000 - thời_gian_phản_hồi × 2)</code>
+    </div>
+
+    <h3>Campus Conquest</h3>
+    <table>
+        <tr>
+            <th>Loại Ô</th>
+            <th>Điểm</th>
+        </tr>
+        <tr>
+            <td>Ô thường</td>
+            <td>1 điểm</td>
+        </tr>
+        <tr>
+            <td>Ô x2</td>
+            <td>2 điểm</td>
+        </tr>
+        <tr>
+            <td>Ô x3</td>
+            <td>3 điểm</td>
+        </tr>
+    </table>
+    <p><strong>Tổng điểm = Tổng các ô bạn sở hữu</strong></p>
+
+    <hr>
+
+    <h2>9. Xử Lý Sự Cố</h2>
+
+    <h3>❌ Không vào được phòng</h3>
+    <p><strong>Nguyên nhân:</strong> Mã phòng sai, phòng đã bắt đầu, hoặc tên đã được sử dụng</p>
+    <p><strong>Giải pháp:</strong> Kiểm tra lại mã, đổi tên khác, hoặc đợi game kết thúc</p>
+
+    <h3>❌ Bị disconnect giữa chừng</h3>
+    <p><strong>Giải pháp:</strong> Refresh trang và nhập lại mã phòng. Nếu game đang chạy, đợi game mới.</p>
+
+    <h3>❌ Lắc không nhận</h3>
+    <p><strong>Nguyên nhân:</strong> Thiết bị không có cảm biến hoặc trình duyệt chưa cấp quyền</p>
+    <p><strong>Giải pháp:</strong> Dùng điện thoại thay vì laptop, cho phép trình duyệt truy cập cảm biến</p>
+
+    <h3>❌ Host bị mất kết nối</h3>
+    <p><strong>Hậu quả:</strong> Tất cả người chơi bị kick, game kết thúc</p>
+    <p><strong>Giải pháp:</strong> Host tạo phòng mới, người chơi nhập lại mã mới</p>
+
+    <hr>
+
+    <h2>10. Câu Hỏi Thường Gặp</h2>
+
+    <p><strong>Q: Bao nhiêu người có thể chơi cùng lúc?</strong><br>
+        A: Không giới hạn, nhưng khuyến nghị 10-100 người cho trải nghiệm tốt nhất.</p>
+
+    <p><strong>Q: Game có lưu điểm không?</strong><br>
+        A: Có! Điểm được lưu vào Firebase và có thể xem lại.</p>
+
+    <p><strong>Q: Có cần cài app không?</strong><br>
+        A: Không, game chạy trên web browser. Chỉ cần mở link và chơi.</p>
+
+    <p><strong>Q: Tại sao tên tôi bị từ chối?</strong><br>
+        A: Tên đã có người dùng trong phòng. Hãy chọn tên khác.</p>
+
+    <p><strong>Q: Host có thể chơi không?</strong><br>
+        A: Không, Host chỉ điều khiển game. Nếu muốn chơi, cần có người khác làm Host.</p>
+
+    <p><strong>Q: Làm sao để trở thành Host?</strong><br>
+        A: Cần biết mật khẩu Host (<code>WelcometoUMT</code>) và truy cập trang Host.</p>
+
+    <hr>
+
+    <h2>📞 Liên Hệ Hỗ Trợ</h2>
+    <p>Nếu gặp vấn đề, vui lòng liên hệ:</p>
+    <ul>
+        <li><strong>Email:</strong> trbui9696@gmail.com </li>
+        <li><strong>Hotline:</strong> 0377 596 $#%</li>
+    </ul>
+
+    <div class="info-box">
+        💡 <strong>Mẹo:</strong> Để có trải nghiệm tốt nhất, hãy sử dụng WiFi ổn định và giữ màn hình sáng trong suốt
+        quá trình chơi.
+    </div>
+
+    <hr>
+    <p style="text-align: center; color: #5f6368;">
+        <strong>© 2025 Reflex Royale - Được phát triển cho Đại học UMT</strong>
+    </p>
+
+</body>
+
+</html>
