@@ -149,6 +149,9 @@ io.on('connection', (socket) => {
     socket.join(roomCode);
     socket.emit('joinedRoom', { roomCode, playerId: socket.id });
 
+    // Track player in Firebase
+    trackPlayer(socket.id, player.nickname);
+
     // Notify host and all players about updated player list
     const playerList = Array.from(room.players.values());
     io.to(roomCode).emit('playerListUpdate', { players: playerList });
@@ -357,6 +360,10 @@ io.on('connection', (socket) => {
     room.players.set(socket.id, player);
     socket.join(roomCode);
     socket.emit('conquestJoined', { roomCode, playerId: socket.id });
+
+    // Track player in Firebase
+    trackPlayer(socket.id, player.nickname);
+
     const playerList = Array.from(room.players.values());
     io.to(roomCode).emit('conquestPlayerListUpdate', { players: playerList });
   });
@@ -483,7 +490,7 @@ function startNextRound(roomCode) {
     startTime: room.roundStartTime
   });
 
-  console.log(`Round ${room.currentRound} started in room ${roomCode}: ${room.roundType}`);
+  console.log(`Round ${room.currentRound} started in room ${roomCode}: ${room.roundType} `);
 
   // Auto-end shake and tap spam rounds after duration
   if (room.roundType === ROUND_TYPES.SHAKE || room.roundType === ROUND_TYPES.TAP_SPAM) {
@@ -559,10 +566,26 @@ function endGame(roomCode) {
   const room = rooms.get(roomCode);
   if (!room) return;
 
+  // Prevent duplicate calls - check if already finished
+  if (room.gameState === 'FINISHED') {
+    console.log(`[Warning] endGame called again for already finished room ${roomCode}`);
+    return;
+  }
+
   room.gameState = 'FINISHED';
 
   const finalLeaderboard = Array.from(room.players.values())
     .sort((a, b) => b.score - a.score);
+
+  // Save game result to Firebase (only once)
+  const gameId = `reflex_${roomCode}_${Date.now()}`;
+  const winner = finalLeaderboard[0] || null;
+  saveGameResult(gameId, 'REFLEX', roomCode, finalLeaderboard, winner);
+
+  // Update player scores in Firebase
+  finalLeaderboard.forEach(player => {
+    updatePlayerScore(player.id, player.score);
+  });
 
   io.to(roomCode).emit('gameOver', { finalLeaderboard });
   console.log(`Game ended in room ${roomCode}`);
@@ -596,7 +619,7 @@ function startConquestRound(roomCode) {
     duration: 12000
   });
 
-  console.log(`Conquest round ${room.currentRound} started in room ${roomCode}`);
+  console.log(`Conquest round ${room.currentRound} started in room ${roomCode} `);
 
   // Auto-end round after 14 seconds (12s client duration + 2s buffer for network delay)
   if (room.roundTimer) clearTimeout(room.roundTimer);
@@ -613,7 +636,7 @@ function endConquestRound(roomCode) {
 
   room.playerActions.forEach((actions, playerId) => {
     actions.forEach(({ x, y }) => {
-      const key = `${x},${y}`;
+      const key = `${x},${y} `;
       if (!cellClaims.has(key)) cellClaims.set(key, []);
       cellClaims.get(key).push(playerId);
     });
@@ -674,11 +697,11 @@ function endConquestRound(roomCode) {
     });
   });
 
-  console.log(`[Conquest] Round ${room.currentRound} - Total actions: ${room.playerActions.size}, Cells claimed: ${cellClaims.size}, Conflicts: ${conflicts.length}`);
+  console.log(`[Conquest] Round ${room.currentRound} - Total actions: ${room.playerActions.size}, Cells claimed: ${cellClaims.size}, Conflicts: ${conflicts.length} `);
 
   io.to(roomCode).emit('conquestRoundEnd');
 
-  console.log(`Conquest round ${room.currentRound} ended in room ${roomCode}`);
+  console.log(`Conquest round ${room.currentRound} ended in room ${roomCode} `);
 
   // Clear actions AFTER processing them
   room.playerActions.clear();
@@ -689,11 +712,27 @@ function endConquestGame(roomCode) {
   const room = rooms.get(roomCode);
   if (!room) return;
 
+  // Prevent duplicate calls - check if already finished
+  if (room.gameState === 'FINISHED') {
+    console.log(`[Warning] endConquestGame called again for already finished room ${roomCode}`);
+    return;
+  }
+
   room.gameState = 'FINISHED';
 
   const finalLeaderboard = Array.from(room.players.values())
     .sort((a, b) => b.territory - a.territory)
     .map((p, index) => ({ ...p, rank: index + 1 }));
+
+  // Save game result to Firebase (only once)
+  const gameId = `conquest_${roomCode}_${Date.now()}`;
+  const winner = finalLeaderboard[0] || null;
+  saveGameResult(gameId, 'CONQUEST', roomCode, finalLeaderboard, winner);
+
+  // Update player scores in Firebase (using territory as score)
+  finalLeaderboard.forEach(player => {
+    updatePlayerScore(player.id, player.territory);
+  });
 
   room.players.forEach((player, playerId) => {
     const playerRank = finalLeaderboard.find(p => p.id === playerId)?.rank || '-';
@@ -705,7 +744,7 @@ function endConquestGame(roomCode) {
 
   io.to(room.hostId).emit('conquestGameOver', { finalLeaderboard });
 
-  console.log(`Conquest game ended in room ${roomCode}`);
+  console.log(`Conquest game ended in room ${roomCode} `);
 }
 
 // Helper: Generate special cells
@@ -716,7 +755,7 @@ function generateSpecialCells(count = 8) {
   while (cells.length < count) {
     const x = Math.floor(Math.random() * 10);
     const y = Math.floor(Math.random() * 10);
-    const key = `${x},${y}`;
+    const key = `${x},${y} `;
 
     if (!positions.has(key)) {
       positions.add(key);
