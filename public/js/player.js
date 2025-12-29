@@ -77,13 +77,13 @@ function showError(message) {
     }, 3000);
 }
 
-// Successfully joined room
+// Joined room successfully
 socket.on('joinedRoom', ({ roomCode: code, playerId: id }) => {
     roomCode = code;
     playerId = id;
-    joinScreen.classList.add('hidden');
-    waitingScreen.classList.remove('hidden');
-    console.log('Joined room:', code);
+    console.log('Joined room:', roomCode);
+    document.body.classList.add('in-game'); // Hide back button
+    showScreen('waiting');
 });
 
 // Error joining
@@ -93,8 +93,7 @@ socket.on('error', ({ message }) => {
 
 // Game started
 socket.on('gameStarted', () => {
-    waitingScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
+    showScreen('game');
 });
 
 // Round start
@@ -341,14 +340,13 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
         <p style="font-size: 1.5rem; color: var(--text-secondary);">
           Tổng điểm: <strong style="color: var(--color-yellow);">${currentScore}</strong>
         </p>
+        <button class="btn btn-primary btn-lg" onclick="window.location.href='/player.html'" style="margin-top: 2rem;">
+          🎮 CHƠI LẠI
+        </button>
       </div>
     </div>
   `;
-
-    // Auto-redirect after 3 seconds
-    setTimeout(() => {
-        window.location.href = '/';
-    }, 3000);
+    // No auto-redirect - player clicks button
 });
 
 // Host disconnected

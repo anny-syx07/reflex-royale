@@ -178,8 +178,8 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
 
-        /* Hide during game */
-        #gameContainer:not([style*="display: none"]) .back-btn {
+        /* Hide back button after joining */
+        body.in-game .back-btn {
             display: none !important;
         }
     </style>
@@ -285,10 +285,10 @@
         }
 
         // Socket: Successfully joined
-        socket.on('conquestJoined', (data) => {
-            playerId = data.playerId;
-            roomCode = data.roomCode;
-
+        socket.on('conquestJoined', ({ roomCode: newRoomCode, playerId: newPlayerId }) => {
+            playerId = newPlayerId;
+            roomCode = newRoomCode;
+            document.body.classList.add('in-game'); // Hide back button
             document.getElementById('waitingScreen').classList.remove('show');
             document.getElementById('gameContainer').style.display = 'flex';
         });
@@ -467,10 +467,18 @@
             document.getElementById('finalScore').textContent = `${yourTerritory} territories`;
             document.getElementById('gameOverScreen').classList.add('show');
 
-            // Auto-redirect after 3 seconds
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 3000);
+            // Add Chơi Lại button
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const existingBtn = gameOverScreen.querySelector('.play-again-btn');
+            if (!existingBtn) {
+                const btn = document.createElement('button');
+                btn.className = 'play-again-btn';
+                btn.textContent = '🎮 CHƠI LẠI';
+                btn.style.cssText = 'padding: 15px 40px; margin-top: 30px; font-size: 18px; font-weight: bold; border-radius: 8px; border: none; background: white; color: var(--primary-purple); cursor: pointer;';
+                btn.onclick = () => window.location.href = '/player.html';
+                gameOverScreen.querySelector('div').appendChild(btn);
+            }
+            // No auto-redirect
         });
 
         // Socket: Error

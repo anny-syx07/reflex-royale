@@ -34,9 +34,8 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
 
-        /* Hide during game */
-        #gameScreen:not(.hidden)~.back-btn,
-        #waitingScreen.hidden~.back-btn {
+        /* Hide back button after joining game */
+        body.in-game .back-btn {
             display: none !important;
         }
     </style>
