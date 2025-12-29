@@ -347,7 +347,7 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
 
     // Auto-redirect after 3 seconds
     setTimeout(() => {
-        window.location.href = '/player.html';
+        window.location.href = '/';
     }, 3000);
 });
 
