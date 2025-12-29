@@ -375,7 +375,7 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
 socket.on('hostDisconnected', () => {
     alert('Host đã ngắt kết nối!');
     cleanupSocket();
-    location.reload();
+    window.location.href = '/player.html'; // Go to clean join page, not reload old URL
 });
 
 // Cleanup function - called before leaving page
