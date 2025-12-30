@@ -98,9 +98,13 @@ function sanitizeNickname(nickname) {
 
 // Validate room code - must be 4 digits
 function validateRoomCode(code) {
-  if (!code || typeof code !== 'string') return null;
-  if (!/^\d{4}$/.test(code)) return null;
-  return code;
+  if (code === null || code === undefined) return null;
+
+  // Convert to string (handle both string and number input)
+  const codeStr = String(code).trim();
+
+  if (!/^\d{4}$/.test(codeStr)) return null;
+  return codeStr;
 }
 
 // Security event logger
