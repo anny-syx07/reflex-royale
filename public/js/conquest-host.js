@@ -64,8 +64,8 @@ socket.on('conquestGameStarted', () => {
 });
 
 // Round started
-socket.on('conquestRoundStarted', (data) => {
-    els.gameStatus.textContent = `Vòng ${data.roundNumber}/${data.totalRounds}`;
+socket.on('conquestRoundStart', (data) => {
+    els.gameStatus.textContent = `Vòng ${data.roundNumber}/${data.maxRounds}`;
     els.roundInfo.textContent = `Thời gian: ${data.duration / 1000}s`;
     startTimer(data.duration);
 });

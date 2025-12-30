@@ -78,6 +78,9 @@ socket.on('roundStart', ({ roundNumber, totalRounds, roundType, roundData, start
     totalRoundsEl.textContent = totalRounds;
     currentRoundType = roundType;
 
+    // Hide next round button when round starts
+    nextRoundBtn.style.display = 'none';
+
     // Clear previous round display
     roundDisplayEl.innerHTML = '';
 
@@ -252,10 +255,8 @@ socket.on('roundEnd', () => {
     // Display "Round Complete" message
     timerValueEl.textContent = '✓';
 
-    // Auto-advance to next round after 3 seconds (host can also manually advance)
-    setTimeout(() => {
-        socket.emit('nextRound', { roomCode });
-    }, 3000);
+    // Show next round button - host must click to advance
+    nextRoundBtn.style.display = 'inline-block';
 });
 
 // Game over
