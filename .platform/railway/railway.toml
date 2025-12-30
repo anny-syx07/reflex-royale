@@ -1,0 +1,16 @@
+# Railway Config - Reflex Royale (Backup/Reference)
+# Docs: https://docs.railway.app/reference/config-as-code
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# Uncomment if needed
+# [variables]
+# NODE_ENV = "production"

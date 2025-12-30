@@ -1,0 +1,25 @@
+# Render Blueprint - Reflex Royale
+# Docs: https://docs.render.com/blueprint-spec
+
+services:
+  - type: web
+    name: reflex-royale
+    runtime: node
+    plan: free
+    
+    # Build settings
+    buildCommand: npm install
+    startCommand: npm start
+    
+    # Environment
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    
+    # Health check (giữ server không sleep)
+    healthCheckPath: /
+    
+    # Auto-deploy khi push lên branch main
+    autoDeploy: true
