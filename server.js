@@ -1,8 +1,154 @@
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
 const path = require('path');
+
+// ============================================================================
+// 🛡️ SECURITY PACKAGES
+// ============================================================================
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const xss = require('xss');
+const hpp = require('hpp');
+
+// ============================================================================
+// 🛡️ SECURITY CONFIGURATION
+// ============================================================================
+
+// Allowed origins for CORS
+const allowedOrigins = [
+  'https://reflex-royale.onrender.com',
+  'https://reflex-royale-production.up.railway.app',
+  'http://localhost:3000',
+  'http://localhost:10000'
+];
+
+// Socket.IO with security options
+const io = require('socket.io')(http, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  maxHttpBufferSize: 1e6, // 1MB max message size
+  allowEIO3: false // Disable legacy protocol
+});
+
+// ============================================================================
+// 🛡️ SECURITY MIDDLEWARE
+// ============================================================================
+
+// Helmet - HTTP Security Headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'", "wss:", "ws:", ...allowedOrigins],
+      imgSrc: ["'self'", "data:", "blob:"],
+      frameSrc: ["'self'", "https://drive.google.com"]
+    }
+  },
+  crossOriginEmbedderPolicy: false
+}));
+
+// HPP - HTTP Parameter Pollution protection
+app.use(hpp());
+
+// General Rate Limiting
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // 200 requests per 15 minutes
+  message: { error: 'Quá nhiều request, thử lại sau 15 phút!' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Strict Rate Limiting for authentication
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // 5 attempts per minute
+  message: { error: 'Quá nhiều lần thử, đợi 1 phút!' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Apply general rate limiting
+app.use(generalLimiter);
+
+// ============================================================================
+// 🛡️ SECURITY HELPER FUNCTIONS
+// ============================================================================
+
+// Sanitize nickname - prevent XSS
+function sanitizeNickname(nickname) {
+  if (!nickname || typeof nickname !== 'string') return 'Player';
+
+  let clean = xss(nickname.trim());
+  clean = clean.substring(0, 20); // Max 20 chars
+  clean = clean.replace(/[<>\"\'&]/g, ''); // Remove dangerous chars
+
+  return clean || 'Player';
+}
+
+// Validate room code - must be 4 digits
+function validateRoomCode(code) {
+  if (!code || typeof code !== 'string') return null;
+  if (!/^\d{4}$/.test(code)) return null;
+  return code;
+}
+
+// Security event logger
+function logSecurityEvent(type, details) {
+  const log = {
+    timestamp: new Date().toISOString(),
+    type,
+    ...details
+  };
+  console.log(`[🛡️ SECURITY] ${type}:`, JSON.stringify(details));
+}
+
+// Socket.IO connection rate limiting
+const connectionAttempts = new Map();
+
+io.use((socket, next) => {
+  const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+  const now = Date.now();
+
+  const attempts = connectionAttempts.get(ip) || [];
+  const recentAttempts = attempts.filter(t => now - t < 60000); // Last 60 seconds
+
+  if (recentAttempts.length > 30) {
+    logSecurityEvent('CONNECTION_BLOCKED', { ip, attempts: recentAttempts.length });
+    return next(new Error('Too many connection attempts'));
+  }
+
+  recentAttempts.push(now);
+  connectionAttempts.set(ip, recentAttempts);
+
+  // Cleanup old entries periodically
+  if (Math.random() < 0.01) {
+    const cutoff = now - 120000;
+    connectionAttempts.forEach((times, key) => {
+      const filtered = times.filter(t => t > cutoff);
+      if (filtered.length === 0) {
+        connectionAttempts.delete(key);
+      } else {
+        connectionAttempts.set(key, filtered);
+      }
+    });
+  }
+
+  next();
+});
+
+// ============================================================================
+// FIREBASE HELPERS
+// ============================================================================
 
 // Firebase helpers (optional - graceful fallback)
 let trackPlayer, updatePlayerScore, saveGameResult;
@@ -22,9 +168,13 @@ try {
 
 const PORT = process.env.PORT || 3000;
 
+// ============================================================================
+// EXPRESS MIDDLEWARE
+// ============================================================================
+
 // Serve static files
 app.use(express.static('public'));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' })); // Limit body size
 
 // Host password (change this to your desired password)
 const HOST_PASSWORD = process.env.HOST_PASSWORD || 'WelcometoUMT';
@@ -34,13 +184,16 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Password verification endpoint
-app.post('/verify-host-password', (req, res) => {
+// Password verification endpoint - with strict rate limiting
+app.post('/verify-host-password', authLimiter, (req, res) => {
   const { password } = req.body;
+  const ip = req.headers['x-forwarded-for'] || req.ip;
 
   if (password === HOST_PASSWORD) {
+    logSecurityEvent('AUTH_SUCCESS', { ip });
     res.json({ success: true });
   } else {
+    logSecurityEvent('AUTH_FAILED', { ip });
     res.json({ success: false });
   }
 });
@@ -110,7 +263,15 @@ io.on('connection', (socket) => {
   });
 
   // Player joins a room
-  socket.on('joinRoom', ({ roomCode, nickname }) => {
+  socket.on('joinRoom', ({ roomCode: rawRoomCode, nickname: rawNickname }) => {
+    // 🛡️ SECURITY: Validate and sanitize input
+    const roomCode = validateRoomCode(rawRoomCode);
+    const nickname = sanitizeNickname(rawNickname);
+
+    if (!roomCode) {
+      socket.emit('error', { message: 'Mã phòng không hợp lệ!' });
+      return;
+    }
     // CLEANUP: Leave all previous rooms before joining new one
     const currentRooms = Array.from(socket.rooms);
     currentRooms.forEach(room => {
@@ -141,7 +302,7 @@ io.on('connection', (socket) => {
 
     const player = {
       id: socket.id,
-      nickname: nickname || `Player${room.players.size + 1}`,
+      nickname: nickname, // Already sanitized above
       score: 0
     };
 
@@ -325,7 +486,15 @@ io.on('connection', (socket) => {
     socket.emit('conquestRoomCreated', { roomCode });
   });
 
-  socket.on('joinConquestRoom', ({ roomCode, nickname }) => {
+  socket.on('joinConquestRoom', ({ roomCode: rawRoomCode, nickname: rawNickname }) => {
+    // 🛡️ SECURITY: Validate and sanitize input
+    const roomCode = validateRoomCode(rawRoomCode);
+    const nickname = sanitizeNickname(rawNickname);
+
+    if (!roomCode) {
+      socket.emit('error', { message: 'Mã phòng không hợp lệ!' });
+      return;
+    }
     // CLEANUP: Leave all previous rooms before joining new one
     const currentRooms = Array.from(socket.rooms);
     currentRooms.forEach(room => {
@@ -354,7 +523,7 @@ io.on('connection', (socket) => {
 
     const player = {
       id: socket.id,
-      nickname: nickname || `Player${room.players.size + 1}`,
+      nickname: nickname, // Already sanitized above
       territory: 0
     };
     room.players.set(socket.id, player);
