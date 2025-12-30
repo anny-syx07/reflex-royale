@@ -269,14 +269,20 @@ io.on('connection', (socket) => {
 
   // Player joins a room
   socket.on('joinRoom', ({ roomCode: rawRoomCode, nickname: rawNickname }) => {
+    console.log('[JOIN] Received join request:', { rawRoomCode, rawNickname, socketId: socket.id });
+
     // 🛡️ SECURITY: Validate and sanitize input
     const roomCode = validateRoomCode(rawRoomCode);
     const nickname = sanitizeNickname(rawNickname);
 
+    console.log('[JOIN] After validation:', { roomCode, nickname });
+
     if (!roomCode) {
+      console.log('[JOIN] Invalid room code:', rawRoomCode);
       socket.emit('error', { message: 'Mã phòng không hợp lệ!' });
       return;
     }
+
     // CLEANUP: Leave all previous rooms before joining new one
     const currentRooms = Array.from(socket.rooms);
     currentRooms.forEach(room => {
@@ -287,13 +293,16 @@ io.on('connection', (socket) => {
     });
 
     const room = rooms.get(roomCode);
+    console.log('[JOIN] Room exists:', !!room, 'Room code:', roomCode);
 
     if (!room) {
+      console.log('[JOIN] Room not found:', roomCode, 'Available rooms:', Array.from(rooms.keys()));
       socket.emit('error', { message: 'Phòng không tồn tại!' });
       return;
     }
 
     if (room.gameState !== 'WAITING') {
+      console.log('[JOIN] Game already started:', room.gameState);
       socket.emit('error', { message: 'Trò chơi đã bắt đầu!' });
       return;
     }
@@ -301,6 +310,7 @@ io.on('connection', (socket) => {
     // UNIQUE NICKNAME CHECK
     const existingNickname = Array.from(room.players.values()).find(p => p.nickname === nickname);
     if (existingNickname) {
+      console.log('[JOIN] Duplicate nickname:', nickname);
       socket.emit('error', { message: `Tên "${nickname}" đã được sử dụng! Vui lòng chọn tên khác.` });
       return;
     }
@@ -314,6 +324,8 @@ io.on('connection', (socket) => {
     room.players.set(socket.id, player);
     socket.join(roomCode);
     socket.emit('joinedRoom', { roomCode, playerId: socket.id });
+
+    console.log('[JOIN] Player joined successfully:', { roomCode, nickname, socketId: socket.id });
 
     // Track player in Firebase
     trackPlayer(socket.id, player.nickname);
