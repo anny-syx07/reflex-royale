@@ -86,11 +86,36 @@ function startTimer(duration) {
     }, 1000);
 }
 
-// Territory update
-socket.on('conquestTerritoryUpdate', (data) => {
+// Map update (after round ends) - sync event name with server
+socket.on('conquestMapUpdate', (data) => {
     if (renderer && grid) {
-        grid.updateCells(data.cells);
+        // Update grid with new ownership data
+        if (data.grid) {
+            for (let x = 0; x < 10; x++) {
+                for (let y = 0; y < 10; y++) {
+                    grid.setCell(x, y, data.grid[x][y]);
+                }
+            }
+        }
         renderer.render();
+    }
+});
+
+// Real-time player cell selection (during round)
+socket.on('conquestPlayerCellUpdate', (data) => {
+    if (renderer) {
+        // Highlight the cell being selected/deselected by player
+        const { x, y, action, playerNickname } = data;
+        const cellEl = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+        if (cellEl) {
+            if (action === 'add') {
+                cellEl.classList.add('player-selecting');
+                cellEl.setAttribute('data-player', playerNickname);
+            } else {
+                cellEl.classList.remove('player-selecting');
+                cellEl.removeAttribute('data-player');
+            }
+        }
     }
 });
 

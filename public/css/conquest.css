@@ -88,6 +88,27 @@ body {
     animation: conflict 0.6s ease;
 }
 
+/* Real-time player selection indicator (host view) */
+.grid-cell.player-selecting {
+    border: 3px solid #FF4444 !important;
+    animation: selecting-pulse 0.6s infinite;
+    box-shadow: 0 0 12px rgba(255, 68, 68, 0.6);
+}
+
+@keyframes selecting-pulse {
+
+    0%,
+    100% {
+        border-color: #FF4444;
+        box-shadow: 0 0 12px rgba(255, 68, 68, 0.6);
+    }
+
+    50% {
+        border-color: #FF8888;
+        box-shadow: 0 0 20px rgba(255, 68, 68, 0.9);
+    }
+}
+
 .grid-cell.special-2x {
     border: 2px solid #FFD700;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
