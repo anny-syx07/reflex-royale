@@ -678,9 +678,12 @@ function startNextRound(roomCode) {
 
   console.log(`Round ${room.currentRound} started in room ${roomCode}: ${room.roundType} `);
 
-  // Auto-end shake and tap spam rounds after duration
+  // Auto-end rounds after duration
   if (room.roundType === ROUND_TYPES.SHAKE || room.roundType === ROUND_TYPES.TAP_SPAM) {
     setTimeout(() => endRound(roomCode), room.roundData.duration);
+  } else if (room.roundType === ROUND_TYPES.COLOR_TAP || room.roundType === ROUND_TYPES.SWIPE) {
+    // Auto-end COLOR_TAP and SWIPE after 5 seconds
+    setTimeout(() => endRound(roomCode), 5000);
   }
 }
 
