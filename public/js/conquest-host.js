@@ -21,7 +21,7 @@ const els = {
     startBtn: document.getElementById('startBtn'),
     nextBtn: document.getElementById('nextBtn'),
     leaderboardList: document.getElementById('leaderboardList'),
-    roundInfo: document.getElementById('roundInfo')
+    roundInfo: document.getElementById('roundDisplay')
 };
 
 // Create new room
@@ -65,16 +65,27 @@ socket.on('conquestGameStarted', () => {
 
 // Round started
 socket.on('conquestRoundStart', (data) => {
+    console.log('[Conquest Host] Round started:', data);
     els.gameStatus.textContent = `Vòng ${data.roundNumber}/${data.maxRounds}`;
-    els.roundInfo.textContent = `Thời gian: ${data.duration / 1000}s`;
+    if (els.roundInfo) {
+        els.roundInfo.textContent = `Round ${data.roundNumber}/${data.maxRounds}`;
+    }
     startTimer(data.duration);
 });
 
 // Round timer
 function startTimer(duration) {
+    console.log('[Conquest Host] Starting timer with duration:', duration);
     if (timerInterval) clearInterval(timerInterval);
     let timeLeft = duration / 1000;
-    els.timerValue.textContent = timeLeft;
+
+    if (els.timerValue) {
+        els.timerValue.textContent = timeLeft;
+        console.log('[Conquest Host] Timer element found, updating to:', timeLeft);
+    } else {
+        console.error('[Conquest Host] Timer element NOT FOUND!');
+        return;
+    }
 
     timerInterval = setInterval(() => {
         timeLeft--;
