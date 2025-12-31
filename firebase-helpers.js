@@ -72,7 +72,12 @@ async function updatePlayerScore(playerId, scoreGained) {
 }
 
 async function saveGameResult(gameId, gameMode, roomCode, players, winner) {
-    if (!db) return;
+    if (!db) {
+        console.log(`[Firebase] DB not initialized - Cannot save game ${gameId}`);
+        return;
+    }
+
+    console.log(`[Firebase] Attempting to save game: ${gameId} at ${new Date().toISOString()}`);
 
     try {
         await db.collection('gameHistory').doc(gameId).set({
@@ -91,9 +96,12 @@ async function saveGameResult(gameId, gameMode, roomCode, players, winner) {
             timestamp: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        console.log(`📊 Game ${gameId} saved to Firebase`);
+        console.log(`✅ [Firebase] Game ${gameId} saved successfully!`);
     } catch (error) {
-        console.error('Firebase saveGameResult error:', error);
+        console.error(`❌ [Firebase] saveGameResult FAILED for ${gameId}:`);
+        console.error(`   Error Code: ${error.code}`);
+        console.error(`   Error Message: ${error.message}`);
+        console.error(`   Stack: ${error.stack}`);
     }
 }
 
