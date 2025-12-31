@@ -4,7 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reflex Royale - Trò Chơi Phản Xạ</title>
+  <title>UMT Game Hub - School Gaming Portal</title>
+  <!-- Google Fonts - Press Start 2P for pixel style -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -13,100 +17,364 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Press Start 2P', cursive;
+      background-color: #5c94fc;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 500px;
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      padding: 40px;
-      text-align: center;
-      animation: fadeIn 0.5s ease;
+      padding: 20px 30px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
-    @keyframes fadeIn {
+    .logo {
+      font-size: 20px;
+      color: white;
+      text-shadow: 3px 3px 0px #000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 24px;
+    }
+
+    /* Clouds */
+    .clouds-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .cloud {
+      position: absolute;
+      width: 96px;
+      height: 48px;
+      animation: floatCloud linear infinite;
+    }
+
+    /* Bottom ellipse - main body */
+    .cloud-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 96px;
+      height: 32px;
+      background: white;
+      border: 2px solid #333;
+      border-radius: 9999px;
+    }
+
+    /* Top left bump */
+    .cloud-top-left {
+      position: absolute;
+      top: 0;
+      left: 25%;
+      width: 48px;
+      height: 40px;
+      background: white;
+      border: 2px solid #333;
+      border-radius: 9999px;
+    }
+
+    /* Top right bump */
+    .cloud-top-right {
+      position: absolute;
+      top: 8px;
+      right: 0;
+      width: 40px;
+      height: 32px;
+      background: white;
+      border: 2px solid #333;
+      border-radius: 9999px;
+    }
+
+    /* White fill to cover inner borders */
+    .cloud-fill {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 30px;
+      background: white;
+      z-index: 1;
+    }
+
+    .cloud-1 {
+      top: 8%;
+      left: -120px;
+      animation-duration: 35s;
+    }
+
+    .cloud-2 {
+      top: 20%;
+      left: -120px;
+      animation-duration: 45s;
+      animation-delay: 8s;
+      transform: scale(1.2);
+    }
+
+    .cloud-3 {
+      top: 12%;
+      left: -120px;
+      animation-duration: 40s;
+      animation-delay: 20s;
+      transform: scale(0.8);
+    }
+
+    @keyframes floatCloud {
       from {
-        opacity: 0;
-        transform: translateY(20px);
+        transform: translateX(0);
       }
 
       to {
+        transform: translateX(calc(100vw + 200px));
+      }
+    }
+
+    /* Main Content */
+    .main-content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 100px 20px 200px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 48px;
+      color: white;
+      text-shadow: 4px 4px 0px #000;
+      margin-bottom: 30px;
+      animation: bounceTitle 0.6s ease-out;
+    }
+
+    @keyframes bounceTitle {
+      0% {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+
+      60% {
+        transform: translateY(10px);
+      }
+
+      100% {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    .logo {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      color: #667eea;
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
-
     .subtitle {
-      color: #666;
-      margin-bottom: 40px;
-      font-size: 16px;
+      font-size: 14px;
+      color: white;
+      text-shadow: 2px 2px 0px #000;
+      margin-bottom: 50px;
+      line-height: 2;
+      max-width: 600px;
+    }
+
+    /* Buttons */
+    .buttons-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .btn {
-      display: block;
-      width: 100%;
-      padding: 20px;
-      margin: 15px 0;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
+      padding: 20px 40px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 14px;
+      border: 4px solid #000;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.1s ease;
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 4px 4px 0px #000;
+    }
+
+    .btn:active {
+      transform: translate(4px, 4px);
+      box-shadow: 0px 0px 0px #000;
+    }
+
+    .btn-student {
+      background: #3a6fd9;
       color: white;
     }
 
-    .btn-host {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    .btn-student:hover {
+      background: #2d5aba;
     }
 
-    .btn-host:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(240, 147, 251, 0.4);
+    .btn-admin {
+      background: #ffc107;
+      color: #000;
     }
 
-    .btn-join {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    .btn-admin:hover {
+      background: #e6ae06;
     }
 
-    .btn-join:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+    /* Ground */
+    .ground-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 5;
     }
 
-    .btn-icon {
-      margin-right: 10px;
-      font-size: 24px;
+    .ground-top {
+      height: 40px;
+      background: #8b5a2b;
+      border-top: 8px solid #228b22;
     }
 
-    .info {
-      margin-top: 30px;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 12px;
-      color: #666;
-      font-size: 14px;
+    .ground-bottom {
+      height: 80px;
+      background: repeating-linear-gradient(90deg,
+          #cd853f 0px,
+          #cd853f 40px,
+          #8b4513 40px,
+          #8b4513 80px);
+    }
+
+    /* Platforms */
+    .platform {
+      position: fixed;
+      z-index: 6;
+    }
+
+    .platform-block {
+      width: 40px;
+      height: 40px;
+      background: #cd853f;
+      border: 4px solid #8b4513;
+      display: inline-block;
+    }
+
+    .platform-1 {
+      bottom: 120px;
+      right: 10%;
+    }
+
+    .platform-2 {
+      bottom: 200px;
+      right: 5%;
+    }
+
+    /* Question Blocks */
+    .question-block {
+      width: 40px;
+      height: 40px;
+      background: #ffc107;
+      border: 4px solid #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+      animation: blockBounce 1s ease-in-out infinite;
+      position: fixed;
+      z-index: 7;
+    }
+
+    .question-block-1 {
+      bottom: 250px;
+      left: 15%;
+    }
+
+    .question-block-2 {
+      bottom: 160px;
+      right: 8%;
+    }
+
+    @keyframes blockBounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* Mario Sprite Animation */
+    .mario {
+      position: fixed;
+      bottom: 125px;
+      width: 35px;
+      height: 47px;
+      background-image: url('/mario_spritesheet.png');
+      background-repeat: no-repeat;
+      image-rendering: pixelated;
+      z-index: 8;
+      animation: runMario 12s linear infinite, marioSprite 0.5s steps(8) infinite;
+    }
+
+    @keyframes marioSprite {
+      from {
+        background-position: 0 0;
+      }
+
+      to {
+        background-position: -280px 0;
+      }
+    }
+
+    @keyframes runMario {
+      0% {
+        left: -50px;
+        transform: scaleX(1);
+      }
+
+      49% {
+        left: calc(100% + 50px);
+        transform: scaleX(1);
+      }
+
+      50% {
+        left: calc(100% + 50px);
+        transform: scaleX(-1);
+      }
+
+      99% {
+        left: -50px;
+        transform: scaleX(-1);
+      }
+
+      100% {
+        left: -50px;
+        transform: scaleX(1);
+      }
     }
 
     /* Password Modal */
@@ -117,7 +385,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.8);
       z-index: 1000;
       justify-content: center;
       align-items: center;
@@ -128,147 +396,240 @@
     }
 
     .modal-content {
-      background: white;
+      background: #5c94fc;
       padding: 40px;
-      border-radius: 20px;
-      max-width: 400px;
+      border: 8px solid #000;
+      max-width: 450px;
       width: 90%;
-      animation: slideUp 0.3s ease;
+      text-align: center;
+      animation: modalBounce 0.3s ease;
     }
 
-    @keyframes slideUp {
-      from {
+    @keyframes modalBounce {
+      0% {
         opacity: 0;
-        transform: translateY(50px);
+        transform: scale(0.8);
       }
 
-      to {
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1);
       }
     }
 
     .modal-content h2 {
-      color: #667eea;
+      color: white;
+      text-shadow: 3px 3px 0px #000;
       margin-bottom: 20px;
+      font-size: 18px;
+    }
+
+    .modal-content p {
+      color: white;
+      text-shadow: 2px 2px 0px #000;
+      margin-bottom: 25px;
+      font-size: 10px;
+      line-height: 1.8;
     }
 
     .modal-content input {
       width: 100%;
       padding: 15px;
-      font-size: 16px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+      border: 4px solid #000;
       margin-bottom: 20px;
-      transition: border-color 0.3s;
+      text-align: center;
     }
 
     .modal-content input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #ffc107;
     }
 
     .modal-buttons {
       display: flex;
-      gap: 10px;
+      gap: 15px;
+      justify-content: center;
     }
 
     .modal-btn {
-      flex: 1;
-      padding: 15px;
-      border: none;
-      border-radius: 8px;
+      padding: 15px 25px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      border: 4px solid #000;
       cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      transition: all 0.3s;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.1s;
+    }
+
+    .modal-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 0px 0px 0px #000;
     }
 
     .modal-btn-confirm {
-      background: #667eea;
+      background: #228b22;
       color: white;
     }
 
-    .modal-btn-confirm:hover {
-      background: #5568d3;
-    }
-
     .modal-btn-cancel {
-      background: #e0e0e0;
-      color: #666;
-    }
-
-    .modal-btn-cancel:hover {
-      background: #d0d0d0;
+      background: #dc3545;
+      color: white;
     }
 
     .error {
-      color: #f5576c;
-      font-size: 14px;
-      margin-bottom: 10px;
+      color: #ff6b6b;
+      font-size: 10px;
+      margin-bottom: 15px;
       display: none;
+      text-shadow: 1px 1px 0px #000;
     }
 
     .error.show {
       display: block;
     }
 
-    @media (max-width: 600px) {
-      .container {
-        padding: 30px 20px;
-      }
-
-      h1 {
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .title {
         font-size: 28px;
       }
 
+      .subtitle {
+        font-size: 10px;
+      }
+
       .btn {
-        padding: 15px;
-        font-size: 16px;
+        padding: 15px 25px;
+        font-size: 10px;
+      }
+
+      .buttons-container {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .question-block-1 {
+        left: 5%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 14px;
+      }
+
+      .title {
+        font-size: 20px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="logo">⚡🎮⚡</div>
-    <h1>Reflex Royale</h1>
-    <p class="subtitle">Trò Chơi Kiểm Tra Phản Xạ</p>
+  <!-- Header -->
+  <div class="header">
+    <span class="logo">
+      <img src="/controller-icon-v2.png" alt="Gamepad" class="logo-icon"
+        style="height: 28px; width: auto; filter: invert(1);">
+      UMT Hub
+    </span>
+  </div>
 
-    <button class="btn btn-host" onclick="showPasswordModal()">
-      <span class="btn-icon">🖥️</span>
-      Tạo Phòng (Host)
-    </button>
-
-    <a href="/player.html" class="btn btn-join">
-      <span class="btn-icon">📱</span>
-      Tham Gia Phòng (Player)
-    </a>
-
-    <div class="info">
-      <strong>📱 Cách Chơi:</strong><br>
-      • <strong>Host:</strong> Tạo phòng và quản lý trò chơi<br>
-      • <strong>Player:</strong> Tham gia phòng với mã code và chơi trên điện thoại
+  <!-- Clouds -->
+  <div class="clouds-container">
+    <div class="cloud cloud-1">
+      <div class="cloud-bottom"></div>
+      <div class="cloud-top-left"></div>
+      <div class="cloud-top-right"></div>
+      <div class="cloud-fill"></div>
+    </div>
+    <div class="cloud cloud-2">
+      <div class="cloud-bottom"></div>
+      <div class="cloud-top-left"></div>
+      <div class="cloud-top-right"></div>
+      <div class="cloud-fill"></div>
+    </div>
+    <div class="cloud cloud-3">
+      <div class="cloud-bottom"></div>
+      <div class="cloud-top-left"></div>
+      <div class="cloud-top-right"></div>
+      <div class="cloud-fill"></div>
     </div>
   </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1 class="title">UMT GAME HUB</h1>
+    <p class="subtitle">
+      School Code style portal to discover,
+      play, and manage mini games.
+    </p>
+
+    <div class="buttons-container">
+      <a href="/player.html" class="btn btn-student">
+        <img src="/student-icon.png" alt="Game" style="height: 24px; width: auto; filter: invert(1);">
+        JOIN ROOM
+      </a>
+      <button class="btn btn-admin" onclick="showPasswordModal()">
+        Admin Access →
+      </button>
+    </div>
+  </div>
+
+  <!-- Ground -->
+  <div class="ground-container">
+    <div class="ground-top"></div>
+    <div class="ground-bottom"></div>
+  </div>
+
+  <!-- Platforms -->
+  <div class="platform platform-1">
+    <div class="platform-block"></div>
+    <div class="platform-block"></div>
+    <div class="platform-block"></div>
+    <div class="platform-block"></div>
+  </div>
+
+  <div class="platform platform-2">
+    <div class="platform-block"></div>
+    <div class="platform-block"></div>
+  </div>
+
+  <!-- Question Blocks -->
+  <div class="question-block question-block-1">?</div>
+  <div class="question-block question-block-2">?</div>
+
+  <!-- Mario Running -->
+  <div class="mario"></div>
 
   <!-- Password Modal -->
   <div class="modal" id="passwordModal">
     <div class="modal-content">
-      <h2>🔒 Xác Thực Host</h2>
-      <p style="color: #666; margin-bottom: 20px;">Nhập mật khẩu để tạo phòng</p>
+      <h2>🔒 ADMIN ACCESS</h2>
+      <p>Enter password to access host controls</p>
 
-      <div class="error" id="errorMsg">❌ Mật khẩu không đúng!</div>
+      <div class="error" id="errorMsg">❌ Wrong password!</div>
 
-      <input type="password" id="passwordInput" placeholder="Nhập mật khẩu..." onkeypress="handleKeyPress(event)">
+      <input type="password" id="passwordInput" placeholder="Password..." onkeypress="handleKeyPress(event)">
 
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-cancel" onclick="closePasswordModal()">
-          Hủy
+          Cancel
         </button>
         <button class="modal-btn modal-btn-confirm" onclick="verifyPassword()">
-          Xác Nhận
+          Enter
         </button>
       </div>
     </div>
@@ -303,7 +664,7 @@
       const error = document.getElementById('errorMsg');
 
       if (!password) {
-        error.textContent = '❌ Vui lòng nhập mật khẩu!';
+        error.textContent = '❌ Please enter password!';
         error.classList.add('show');
         return;
       }
@@ -320,18 +681,16 @@
         const data = await response.json();
 
         if (data.success) {
-          // Store auth token
           sessionStorage.setItem('hostAuth', 'true');
-          // Redirect to host page
           window.location.href = '/host.html';
         } else {
-          error.textContent = '❌ Mật khẩu không đúng!';
+          error.textContent = '❌ Wrong password!';
           error.classList.add('show');
           document.getElementById('passwordInput').value = '';
           document.getElementById('passwordInput').focus();
         }
       } catch (err) {
-        error.textContent = '❌ Lỗi kết nối! Thử lại sau.';
+        error.textContent = '❌ Connection error!';
         error.classList.add('show');
       }
     }
