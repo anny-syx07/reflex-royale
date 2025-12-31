@@ -81,6 +81,7 @@ function startTimer(duration) {
 
     if (els.timerValue) {
         els.timerValue.textContent = timeLeft;
+        els.timerValue.classList.remove('warning'); // Reset warning state
         console.log('[Conquest Host] Timer element found, updating to:', timeLeft);
     } else {
         console.error('[Conquest Host] Timer element NOT FOUND!');
@@ -90,6 +91,14 @@ function startTimer(duration) {
     timerInterval = setInterval(() => {
         timeLeft--;
         els.timerValue.textContent = Math.max(0, timeLeft);
+
+        // Add red warning when time is low
+        if (timeLeft <= 3) {
+            els.timerValue.classList.add('warning');
+        } else {
+            els.timerValue.classList.remove('warning');
+        }
+
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
