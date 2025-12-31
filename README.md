@@ -91,10 +91,14 @@ reflex-royale/
 ├── .platform/             # Hosting configs
 │   ├── render/
 │   └── railway/
-└── docs/                  # Documentation & assets
+└── docs/                  # Documentation
+    ├── ARCHITECTURE.md
+    ├── DEVELOPMENT.md
+    ├── HOSTING_GUIDE.md
+    └── PLATFORM_GUIDE.md
 ```
 
-📐 **Xem chi tiết**: [ARCHITECTURE.md](ARCHITECTURE.md)
+📐 **Xem chi tiết**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 ---
 
@@ -160,7 +164,7 @@ npm start
 # Server auto-restarts on file changes
 ```
 
-📖 **Xem thêm**: [DEVELOPMENT.md](DEVELOPMENT.md)
+📖 **Xem thêm**: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
 
 ---
 
