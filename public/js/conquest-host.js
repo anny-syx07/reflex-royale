@@ -17,7 +17,7 @@ const els = {
     playerCount: document.getElementById('playerCount'),
     gridContainer: document.getElementById('gridContainer'),
     gameStatus: document.getElementById('gameStatus'),
-    timerValue: document.getElementById('timerValue'),
+    timerValue: document.getElementById('timer'),
     startBtn: document.getElementById('startBtn'),
     nextBtn: document.getElementById('nextBtn'),
     leaderboardList: document.getElementById('leaderboardList'),
