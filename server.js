@@ -177,8 +177,13 @@ const PORT = process.env.PORT || 3000;
 // EXPRESS MIDDLEWARE
 // ============================================================================
 
+// Determine static directory based on environment
+const isProduction = process.env.NODE_ENV === 'production';
+const staticDir = isProduction ? 'dist' : 'public';
+console.log(`📂 Serving static files from: ${staticDir}/ (${isProduction ? 'production' : 'development'} mode)`);
+
 // Serve static files
-app.use(express.static('public'));
+app.use(express.static(staticDir));
 app.use(express.json({ limit: '10kb' })); // Limit body size
 
 // Host password (change this to your desired password)
@@ -186,7 +191,7 @@ const HOST_PASSWORD = process.env.HOST_PASSWORD || 'WelcometoUMT';
 
 // Root route - serve landing page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, staticDir, 'index.html'));
 });
 
 // Password verification endpoint - with strict rate limiting

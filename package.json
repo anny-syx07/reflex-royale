@@ -4,7 +4,9 @@
   "description": "Real-time multiplayer reflex game",
   "main": "server.js",
   "scripts": {
+    "build": "node build.js",
     "start": "node server.js",
+    "start:prod": "npm run build && NODE_ENV=production node server.js",
     "dev": "node server.js"
   },
   "keywords": [
@@ -25,6 +27,9 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
-    "socket.io-client": "^4.8.3"
+    "clean-css": "^5.3.3",
+    "html-minifier-terser": "^7.2.0",
+    "socket.io-client": "^4.8.3",
+    "terser": "^5.44.1"
   }
 }
