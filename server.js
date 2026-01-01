@@ -152,22 +152,22 @@ io.use((socket, next) => {
 });
 
 // ============================================================================
+// EVENTBUS & HANDLERS
+// ============================================================================
+const eventBus = require('./eventBus');
+const analyticsHandler = require('./handlers/analyticsHandler');
+const leaderboardHandler = require('./handlers/leaderboardHandler');
+
+// ============================================================================
 // FIREBASE HELPERS
 // ============================================================================
 
 // Firebase helpers (optional - graceful fallback)
-let trackPlayer, updatePlayerScore, saveGameResult;
+let firebaseHelpers = null;
 try {
-  const firebaseHelpers = require('./firebase-helpers');
-  trackPlayer = firebaseHelpers.trackPlayer;
-  updatePlayerScore = firebaseHelpers.updatePlayerScore;
-  saveGameResult = firebaseHelpers.saveGameResult;
+  firebaseHelpers = require('./firebase-helpers');
   console.log('🔥 Firebase helpers loaded');
 } catch (error) {
-  // Firebase not available - use no-op functions
-  trackPlayer = async () => { };
-  updatePlayerScore = async () => { };
-  saveGameResult = async () => { };
   console.log('⚠️  Firebase helpers not available - tracking disabled');
 }
 
@@ -210,6 +210,13 @@ app.post('/verify-host-password', authLimiter, (req, res) => {
 
 // Room storage
 const rooms = new Map();
+
+// ============================================================================
+// INITIALIZE EVENT HANDLERS
+// ============================================================================
+analyticsHandler.init(firebaseHelpers);
+leaderboardHandler.init(io, rooms);
+console.log('🚀 EventBus handlers initialized');
 
 // Generate unique room code (4 digits)
 function generateRoomCode() {
@@ -332,8 +339,8 @@ io.on('connection', (socket) => {
 
     console.log('[JOIN] Player joined successfully:', { roomCode, nickname, socketId: socket.id });
 
-    // Track player in Firebase
-    trackPlayer(socket.id, player.nickname);
+    // Emit event for handlers (analytics, etc.)
+    eventBus.emit('PLAYER_JOINED', { playerId: socket.id, nickname: player.nickname, roomCode });
 
     // Notify host and all players about updated player list
     const playerList = Array.from(room.players.values());
@@ -411,17 +418,8 @@ io.on('connection', (socket) => {
     // Send feedback to player
     socket.emit('responseResult', { correct, points, totalScore: player.score });
 
-    // OPTIMIZATION: Throttle leaderboard updates (max 1 per second per room)
-    if (!room.lastLeaderboardUpdate || Date.now() - room.lastLeaderboardUpdate > 1000) {
-      room.lastLeaderboardUpdate = Date.now();
-
-      const leaderboard = Array.from(room.players.values())
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10)
-        .map(p => ({ id: p.id, nickname: p.nickname, score: p.score })); // Only send needed data
-
-      io.to(roomCode).emit('leaderboardUpdate', { leaderboard });
-    }
+    // Emit event for leaderboard handler (throttled there)
+    eventBus.emit('SCORE_UPDATED', { roomCode, playerId: socket.id, score: player.score });
   });
 
   // Shake count update
@@ -747,11 +745,8 @@ function endRound(roomCode) {
   }
 
   // Update final leaderboard
-  const leaderboard = Array.from(room.players.values())
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
-
-  io.to(roomCode).emit('leaderboardUpdate', { leaderboard });
+  // Emit event for leaderboard update (bypass throttle)
+  eventBus.emit('ROUND_ENDED', { roomCode });
   io.to(roomCode).emit('roundEnd');
 }
 
@@ -771,14 +766,13 @@ function endGame(roomCode) {
   const finalLeaderboard = Array.from(room.players.values())
     .sort((a, b) => b.score - a.score);
 
-  // Save game result to Firebase (only once)
-  const gameId = `reflex_${roomCode}_${Date.now()}`;
+  // Emit event for analytics handler (saves to Firebase)
   const winner = finalLeaderboard[0] || null;
-  saveGameResult(gameId, 'REFLEX', roomCode, finalLeaderboard, winner);
-
-  // Update player scores in Firebase
-  finalLeaderboard.forEach(player => {
-    updatePlayerScore(player.id, player.score);
+  eventBus.emit('GAME_ENDED', {
+    roomCode,
+    gameMode: 'REFLEX',
+    leaderboard: finalLeaderboard,
+    winner
   });
 
   io.to(roomCode).emit('gameOver', { finalLeaderboard });
