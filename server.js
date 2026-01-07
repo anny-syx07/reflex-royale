@@ -809,14 +809,14 @@ function startConquestRound(roomCode) {
     maxRounds: room.maxRounds,
     currentAP: 3,
     mapState,
-    duration: 12000
+    duration: 5000
   });
 
   console.log(`Conquest round ${room.currentRound} started in room ${roomCode} `);
 
   // Auto-end round after 14 seconds (12s client duration + 2s buffer for network delay)
   if (room.roundTimer) clearTimeout(room.roundTimer);
-  room.roundTimer = setTimeout(() => endConquestRound(roomCode), 14000);
+  room.roundTimer = setTimeout(() => endConquestRound(roomCode), 7000);
 }
 
 // End conquest round
