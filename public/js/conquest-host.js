@@ -143,7 +143,9 @@ socket.on('conquestPlayerCellUpdate', (data) => {
 socket.on('conquestRoundEnd', (data) => {
     els.gameStatus.textContent = 'Vòng kết thúc!';
     els.nextBtn.style.display = 'block';
-    updateLeaderboard(data.leaderboard);
+    if (data && data.leaderboard) {
+        updateLeaderboard(data.leaderboard);
+    }
 });
 
 // Next round
