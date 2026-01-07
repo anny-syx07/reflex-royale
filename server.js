@@ -890,6 +890,12 @@ function endConquestRound(roomCode) {
     });
   });
 
+  // Also emit to host so they can show the "Next Round" button
+  io.to(room.hostId).emit('conquestRoundEnd', {
+    leaderboard,
+    conflicts
+  });
+
   console.log(`[Conquest] Round ${room.currentRound} - Total actions: ${room.playerActions.size}, Cells claimed: ${cellClaims.size}, Conflicts: ${conflicts.length} `);
 
   console.log(`Conquest round ${room.currentRound} ended in room ${roomCode} `);

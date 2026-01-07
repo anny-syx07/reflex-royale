@@ -141,8 +141,10 @@ socket.on('conquestPlayerCellUpdate', (data) => {
 
 // Round end
 socket.on('conquestRoundEnd', (data) => {
+    console.log('[Conquest Host] conquestRoundEnd received:', data);
     els.gameStatus.textContent = 'Vòng kết thúc!';
     els.nextBtn.style.display = 'block';
+    console.log('[Conquest Host] nextBtn display set to block');
     if (data && data.leaderboard) {
         updateLeaderboard(data.leaderboard);
     }
