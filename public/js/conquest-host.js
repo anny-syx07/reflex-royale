@@ -24,6 +24,50 @@ const els = {
     roundInfo: document.getElementById('roundDisplay')
 };
 
+// Check for existing room to reconnect
+const savedRoomCode = localStorage.getItem('conquestHostRoom');
+if (savedRoomCode) {
+    console.log('[Conquest Host] Found saved room:', savedRoomCode);
+    socket.emit('reconnectHost', { roomCode: savedRoomCode });
+}
+
+// Handle reconnection result
+socket.on('reconnectResult', ({ success, roomCode: code, gameState: state, players, gameMode, message }) => {
+    if (success && gameMode === 'CONQUEST') {
+        console.log('[Conquest Host] Reconnected to room:', code);
+        roomCode = code;
+        els.roomCode.textContent = roomCode;
+        els.waitingScreen.classList.add('hidden');
+        els.mainDisplay.style.display = 'flex';
+        els.sidebar.style.display = 'flex';
+
+        // Initialize grid
+        grid = new ConquestGrid(10);
+        grid.initializeSpecialCells(8);
+        renderer = new ConquestRenderer(els.gridContainer, grid, {
+            large: true,
+            clickable: false
+        });
+
+        // Update player count
+        if (players) {
+            els.playerCount.textContent = players.length;
+            updateLeaderboard(players);
+        }
+
+        // Restore UI based on state
+        if (state === 'WAITING') {
+            els.startBtn.style.display = 'block';
+            els.nextBtn.style.display = 'none';
+        } else if (state === 'PLAYING') {
+            els.startBtn.style.display = 'none';
+        }
+    } else if (!success) {
+        console.log('[Conquest Host] Could not reconnect:', message);
+        localStorage.removeItem('conquestHostRoom');
+    }
+});
+
 // Create new room
 function createRoom() {
     socket.emit('createConquestRoom');
@@ -33,6 +77,7 @@ function createRoom() {
 socket.on('conquestRoomCreated', (data) => {
     roomCode = data.roomCode;
     els.roomCode.textContent = roomCode;
+    localStorage.setItem('conquestHostRoom', roomCode);
     els.waitingScreen.classList.add('hidden');
     els.mainDisplay.style.display = 'flex';
     els.sidebar.style.display = 'flex';
@@ -44,7 +89,36 @@ socket.on('conquestRoomCreated', (data) => {
         large: true,
         clickable: false
     });
+
+    // Generate QR code
+    generateQRCode(roomCode);
 });
+
+// Generate QR code for room
+function generateQRCode(code) {
+    const canvas = document.getElementById('qrCode');
+    if (!canvas || typeof QRCode === 'undefined') {
+        console.log('[Conquest Host] QR Code generation skipped');
+        return;
+    }
+
+    const playerUrl = `${window.location.origin}/player.html?roomCode=${code}&mode=conquest`;
+
+    QRCode.toCanvas(canvas, playerUrl, {
+        width: 150,
+        margin: 2,
+        color: {
+            dark: '#667eea',
+            light: '#ffffff'
+        }
+    }, (error) => {
+        if (error) {
+            console.error('[Conquest Host] QR Code error:', error);
+        } else {
+            console.log('[Conquest Host] QR Code generated for:', playerUrl);
+        }
+    });
+}
 
 // Player list update
 socket.on('conquestPlayerListUpdate', (data) => {
@@ -161,7 +235,62 @@ socket.on('conquestGameOver', (data) => {
     els.gameStatus.textContent = '🎉 Trò Chơi Kết Thúc!';
     els.nextBtn.style.display = 'none';
     updateLeaderboard(data.finalLeaderboard);
-    // Host controls when to leave - no auto-redirect
+
+    // Show "Chơi Lại" button
+    if (!document.getElementById('resetBtn')) {
+        const resetBtn = document.createElement('button');
+        resetBtn.id = 'resetBtn';
+        resetBtn.className = 'btn btn-primary';
+        resetBtn.textContent = '🔄 Chơi Lại';
+        resetBtn.style.marginTop = '15px';
+        resetBtn.onclick = resetConquestRoom;
+        els.startBtn.parentElement.appendChild(resetBtn);
+    }
+    document.getElementById('resetBtn').style.display = 'block';
+});
+
+// Reset conquest room (soft reset - keep players)
+function resetConquestRoom() {
+    socket.emit('resetConquestRoom', { roomCode });
+}
+
+// Room reset - return to waiting state
+socket.on('conquestRoomReset', ({ players }) => {
+    console.log('[Conquest Host] Room reset, players kept:', players.length);
+
+    // Clear timer
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    // Reset UI
+    els.gameStatus.textContent = 'Waiting for players...';
+    els.timerValue.textContent = '5';
+    els.timerValue.classList.remove('warning');
+    if (els.roundInfo) {
+        els.roundInfo.textContent = 'Round 1/12';
+    }
+
+    // Reset grid
+    if (grid) {
+        grid = new ConquestGrid(10);
+        grid.initializeSpecialCells(8);
+        renderer = new ConquestRenderer(els.gridContainer, grid, {
+            large: true,
+            clickable: false
+        });
+    }
+
+    // Show start button, hide others
+    els.startBtn.style.display = 'block';
+    els.nextBtn.style.display = 'none';
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) resetBtn.style.display = 'none';
+
+    // Update player count
+    els.playerCount.textContent = players.length;
+    updateLeaderboard(players);
 });
 
 // Update leaderboard

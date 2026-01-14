@@ -481,6 +481,39 @@
             // No auto-redirect
         });
 
+        // Socket: Room reset - return to waiting state
+        socket.on('conquestRoomReset', ({ players }) => {
+            console.log('[Conquest Player] Room reset by host, returning to waiting');
+
+            // Clear timers
+            if (timerInterval) clearInterval(timerInterval);
+            if (failsafeTimeout) clearTimeout(failsafeTimeout);
+            timerInterval = null;
+            failsafeTimeout = null;
+
+            // Reset game state
+            pendingActions = [];
+            hasSubmitted = false;
+            currentAP = 3;
+
+            // Reset grid if exists
+            if (grid) {
+                grid = null;
+                renderer = null;
+            }
+
+            // Hide game over screen
+            document.getElementById('gameOverScreen').classList.remove('show');
+
+            // Show waiting message (already joined, just waiting for game to start)
+            document.getElementById('gameContainer').style.display = 'flex';
+            document.getElementById('roundDisplay').textContent = 'Round 1/12';
+            document.getElementById('timer').textContent = '12';
+            document.getElementById('timer').classList.remove('warning');
+            document.getElementById('territoryCount').textContent = '0';
+            document.getElementById('playerRank').textContent = '-';
+        });
+
         // Socket: Error
         socket.on('error', (data) => {
             alert(data.message);

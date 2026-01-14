@@ -373,6 +373,35 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
     gameScreen.appendChild(container);
 });
 
+// Room reset - return to waiting screen (game restarting)
+socket.on('roomReset', ({ players }) => {
+    console.log('[Player] Room reset by host, returning to waiting screen');
+
+    // Reset game state
+    currentScore = 0;
+    currentRoundType = null;
+    shakeCount = 0;
+    tapCount = 0;
+
+    // Clear intervals
+    if (shakeInterval) {
+        clearInterval(shakeInterval);
+        shakeInterval = null;
+    }
+    window.removeEventListener('devicemotion', handleShake);
+
+    // Reset UI
+    scoreValue.textContent = '0';
+    colorButtons.classList.add('hidden');
+    swipeArea.classList.add('hidden');
+    shakeArea.classList.add('hidden');
+    tapSpamArea.classList.add('hidden');
+
+    // Show waiting screen
+    gameScreen.classList.add('hidden');
+    waitingScreen.classList.remove('hidden');
+});
+
 // Host disconnected - player stays on screen, uses 'Chơi Lại' button when ready
 socket.on('hostDisconnected', () => {
     console.log('Host disconnected - player stays on results screen');

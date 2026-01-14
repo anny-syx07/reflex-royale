@@ -45,7 +45,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net"],
       scriptSrcAttr: ["'unsafe-inline'"], // Allow onclick handlers
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
@@ -599,7 +599,112 @@ io.on('connection', (socket) => {
     startConquestRound(roomCode);
   });
 
-  // Disconnect handling
+  // === SOFT RESET HANDLERS ===
+
+  // Reset Reflex Royale room (keep players, reset game state)
+  socket.on('resetRoom', ({ roomCode }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.hostId !== socket.id) {
+      socket.emit('error', { message: 'Không có quyền!' });
+      return;
+    }
+
+    // Reset game state
+    room.gameState = 'WAITING';
+    room.currentRound = 0;
+    room.roundType = null;
+    room.roundData = null;
+    room.roundStartTime = null;
+    room.responses.clear();
+
+    // Reset all player scores
+    room.players.forEach(player => {
+      player.score = 0;
+    });
+
+    // Notify all players
+    const playerList = Array.from(room.players.values());
+    io.to(roomCode).emit('roomReset', { players: playerList });
+    io.to(roomCode).emit('playerListUpdate', { players: playerList });
+
+    console.log(`[Reset] Room ${roomCode} reset by host. ${playerList.length} players kept.`);
+  });
+
+  // Reset Campus Conquest room (keep players, reset game state)
+  socket.on('resetConquestRoom', ({ roomCode }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.hostId !== socket.id || room.gameMode !== 'CONQUEST') {
+      socket.emit('error', { message: 'Không có quyền!' });
+      return;
+    }
+
+    // Clear timer if running
+    if (room.roundTimer) {
+      clearTimeout(room.roundTimer);
+      room.roundTimer = null;
+    }
+
+    // Reset game state
+    room.gameState = 'WAITING';
+    room.currentRound = 0;
+    room.grid = Array(10).fill(null).map(() => Array(10).fill(null));
+    room.specialCells = generateSpecialCells();
+    room.playerActions.clear();
+
+    // Reset all player territories
+    room.players.forEach(player => {
+      player.territory = 0;
+    });
+
+    // Notify all players
+    const playerList = Array.from(room.players.values());
+    io.to(roomCode).emit('conquestRoomReset', { players: playerList });
+    io.to(roomCode).emit('conquestPlayerListUpdate', { players: playerList });
+
+    console.log(`[Reset] Conquest room ${roomCode} reset by host. ${playerList.length} players kept.`);
+  });
+
+  // === HOST RECONNECTION ===
+
+  // Host reconnects to existing room
+  socket.on('reconnectHost', ({ roomCode }) => {
+    const room = rooms.get(roomCode);
+
+    if (!room) {
+      socket.emit('reconnectResult', { success: false, message: 'Phòng không tồn tại hoặc đã hết hạn!' });
+      return;
+    }
+
+    // Check if room is waiting for host reconnection
+    if (room.hostDisconnectTimeout) {
+      clearTimeout(room.hostDisconnectTimeout);
+      room.hostDisconnectTimeout = null;
+    }
+
+    // Update host ID to new socket
+    const oldHostId = room.hostId;
+    room.hostId = socket.id;
+    socket.join(roomCode);
+
+    // Notify players that host is back
+    io.to(roomCode).emit('hostReconnected');
+
+    // Send current state to host
+    const playerList = Array.from(room.players.values());
+    socket.emit('reconnectResult', {
+      success: true,
+      roomCode,
+      gameState: room.gameState,
+      players: playerList,
+      currentRound: room.currentRound,
+      totalRounds: room.totalRounds || room.maxRounds,
+      gameMode: room.gameMode || 'REFLEX'
+    });
+
+    console.log(`[Reconnect] Host reconnected to room ${roomCode}. Old: ${oldHostId}, New: ${socket.id}`);
+  });
+
+  // Disconnect handling with grace period
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
 
@@ -609,12 +714,30 @@ io.on('connection', (socket) => {
         room.players.delete(socket.id);
         const playerList = Array.from(room.players.values());
         io.to(roomCode).emit('playerListUpdate', { players: playerList });
+
+        // Also emit conquest-specific event if needed
+        if (room.gameMode === 'CONQUEST') {
+          io.to(roomCode).emit('conquestPlayerListUpdate', { players: playerList });
+        }
       }
 
-      // If host disconnects, end the game
+      // If host disconnects, start grace period instead of immediate deletion
       if (room.hostId === socket.id) {
-        io.to(roomCode).emit('hostDisconnected');
-        rooms.delete(roomCode);
+        console.log(`[Grace] Host disconnected from room ${roomCode}. Starting 60s grace period...`);
+
+        // Notify players that host is temporarily disconnected
+        io.to(roomCode).emit('hostTemporarilyDisconnected');
+
+        // Set 60-second grace period
+        room.hostDisconnectTimeout = setTimeout(() => {
+          // Check if room still exists and host hasn't reconnected
+          const currentRoom = rooms.get(roomCode);
+          if (currentRoom && currentRoom.hostId === socket.id) {
+            console.log(`[Grace] Grace period expired for room ${roomCode}. Deleting room.`);
+            io.to(roomCode).emit('hostDisconnected');
+            rooms.delete(roomCode);
+          }
+        }, 60000); // 60 seconds grace period
       }
     });
   });

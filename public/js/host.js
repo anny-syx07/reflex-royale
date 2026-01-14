@@ -30,15 +30,96 @@ const newGameBtn = document.getElementById('newGameBtn');
 const timerValueEl = document.getElementById('timerValue');
 const nextRoundBtn = document.getElementById('nextRoundBtn');
 
-// Initialize - Create room on load
-socket.emit('createRoom');
+// Check for existing room to reconnect
+const savedRoomCode = localStorage.getItem('reflexHostRoom');
+if (savedRoomCode) {
+    console.log('[Host] Found saved room:', savedRoomCode);
+    socket.emit('reconnectHost', { roomCode: savedRoomCode });
+} else {
+    // No saved room, create new one
+    socket.emit('createRoom');
+}
+
+// Handle reconnection result
+socket.on('reconnectResult', ({ success, roomCode: code, gameState: state, players, message }) => {
+    if (success) {
+        console.log('[Host] Reconnected to room:', code);
+        roomCode = code;
+        roomCodeEl.textContent = code;
+
+        // Update player list
+        if (players) {
+            playerCountEl.textContent = players.length;
+            playerListEl.innerHTML = '';
+            players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'player-card';
+                playerCard.textContent = player.nickname;
+                playerListEl.appendChild(playerCard);
+            });
+            startGameBtn.disabled = players.length === 0;
+        }
+
+        // Restore game state
+        if (state === 'WAITING') {
+            waitingScreen.classList.remove('hidden');
+            gameScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+        } else if (state === 'PLAYING') {
+            waitingScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameOverScreen.classList.add('hidden');
+        } else if (state === 'FINISHED') {
+            waitingScreen.classList.add('hidden');
+            gameScreen.classList.add('hidden');
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // Generate QR code
+        generateQRCode(code);
+    } else {
+        console.log('[Host] Could not reconnect:', message);
+        localStorage.removeItem('reflexHostRoom');
+        socket.emit('createRoom');
+    }
+});
 
 // Room created
 socket.on('roomCreated', ({ roomCode: code }) => {
     roomCode = code;
     roomCodeEl.textContent = code;
+    localStorage.setItem('reflexHostRoom', code);
     console.log('Room created:', code);
+
+    // Generate QR code
+    generateQRCode(code);
 });
+
+// Generate QR code for room
+function generateQRCode(code) {
+    const canvas = document.getElementById('qrCode');
+    if (!canvas || typeof QRCode === 'undefined') {
+        console.log('[Host] QR Code generation skipped - canvas or library not found');
+        return;
+    }
+
+    const playerUrl = `${window.location.origin}/player.html?roomCode=${code}`;
+
+    QRCode.toCanvas(canvas, playerUrl, {
+        width: 200,
+        margin: 2,
+        color: {
+            dark: '#667eea',
+            light: '#ffffff'
+        }
+    }, (error) => {
+        if (error) {
+            console.error('[Host] QR Code error:', error);
+        } else {
+            console.log('[Host] QR Code generated for:', playerUrl);
+        }
+    });
+}
 
 // Player list update
 socket.on('playerListUpdate', ({ players }) => {
@@ -279,10 +360,38 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
     // Host controls when to leave - no auto-redirect
 });
 
-// New game
+// New game - Soft reset (keep players)
 newGameBtn.addEventListener('click', () => {
-    cleanupHost();
-    window.location.href = '/host.html';
+    socket.emit('resetRoom', { roomCode });
+});
+
+// Room reset - return to waiting screen with players intact
+socket.on('roomReset', ({ players }) => {
+    console.log('[Host] Room reset, players kept:', players.length);
+
+    // Clear timers
+    if (globalTimer) clearInterval(globalTimer);
+    if (roundTimer) clearInterval(roundTimer);
+    globalTimer = null;
+    roundTimer = null;
+
+    // Reset UI
+    gameOverScreen.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    waitingScreen.classList.remove('hidden');
+
+    // Update player list
+    playerCountEl.textContent = players.length;
+    playerListEl.innerHTML = '';
+    players.forEach(player => {
+        const playerCard = document.createElement('div');
+        playerCard.className = 'player-card';
+        playerCard.textContent = player.nickname;
+        playerListEl.appendChild(playerCard);
+    });
+
+    // Enable start button
+    startGameBtn.disabled = players.length === 0;
 });
 
 // Host disconnected

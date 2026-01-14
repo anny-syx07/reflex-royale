@@ -206,7 +206,9 @@
         <div class="panel room-code-display">
             <div>Mã Phòng</div>
             <div class="room-code" id="roomCode">------</div>
-            <div style="font-size: 16px;">Người chơi nhập mã này để tham gia</div>
+            <canvas id="qrCode"
+                style="margin: 10px auto; display: block; max-width: 150px; border-radius: 8px;"></canvas>
+            <div style="font-size: 14px;">Quét QR hoặc nhập mã</div>
         </div>
 
         <div class="panel">
@@ -230,6 +232,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/conquest-game.js"></script>
     <script src="/js/conquest-host.js"></script>

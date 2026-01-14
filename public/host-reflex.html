@@ -50,7 +50,8 @@
       <div class="room-code-container glass fade-in">
         <p class="room-code-label">Mã Phòng</p>
         <h2 class="room-code" id="roomCode">------</h2>
-        <p class="room-code-instruction">Vào <strong>reflex-royale</strong> và nhập mã trên</p>
+        <canvas id="qrCode" style="margin: 15px auto; display: block; max-width: 200px;"></canvas>
+        <p class="room-code-instruction">Quét mã QR hoặc vào <strong>reflex-royale</strong> và nhập mã trên</p>
       </div>
 
       <div class="players-waiting glass fade-in">
@@ -108,6 +109,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/host.js"></script>
 </body>
