@@ -105,8 +105,9 @@ function generateQRCode(code) {
     const playerUrl = `${window.location.origin}/player.html?roomCode=${code}&mode=conquest`;
 
     QRCode.toCanvas(canvas, playerUrl, {
-        width: 150,
-        margin: 2,
+        width: 120,
+        margin: 1,
+        errorCorrectionLevel: 'L',
         color: {
             dark: '#667eea',
             light: '#ffffff'
