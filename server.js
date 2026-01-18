@@ -45,13 +45,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://www.youtube.com", "https://s.ytimg.com"],
       scriptSrcAttr: ["'unsafe-inline'"], // Allow onclick handlers
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: ["'self'", "wss:", "ws:", ...allowedOrigins],
       imgSrc: ["'self'", "data:", "blob:"],
-      frameSrc: ["'self'", "https://drive.google.com"]
+      frameSrc: ["'self'", "https://drive.google.com", "https://www.youtube.com"]
     }
   },
   crossOriginEmbedderPolicy: false

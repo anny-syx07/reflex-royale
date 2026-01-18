@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Player - Reflex Royale</title>
+    <!-- Google Fonts - Press Start 2P for pixel style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,86 +17,447 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Press Start 2P', cursive;
+            background-color: #5c94fc;
+            /* Super Mario Sky Blue */
             min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Clouds */
+        .clouds-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cloud {
+            position: absolute;
+            width: 96px;
+            height: 48px;
+            animation: floatCloud linear infinite;
+        }
+
+        .cloud-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 96px;
+            height: 32px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 9999px;
+        }
+
+        .cloud-top-left {
+            position: absolute;
+            top: 0;
+            left: 25%;
+            width: 48px;
+            height: 40px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 9999px;
+        }
+
+        .cloud-top-right {
+            position: absolute;
+            top: 8px;
+            right: 0;
+            width: 40px;
+            height: 32px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 9999px;
+        }
+
+        .cloud-fill {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 30px;
+            background: white;
+            z-index: 1;
+        }
+
+        .cloud-1 {
+            top: 8%;
+            left: -120px;
+            animation-duration: 35s;
+        }
+
+        .cloud-2 {
+            top: 20%;
+            left: -120px;
+            animation-duration: 45s;
+            animation-delay: 8s;
+            transform: scale(1.2);
+        }
+
+        .cloud-3 {
+            top: 12%;
+            left: -120px;
+            animation-duration: 40s;
+            animation-delay: 20s;
+            transform: scale(0.8);
+        }
+
+        @keyframes floatCloud {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(calc(100vw + 200px));
+            }
+        }
+
+        /* Ground */
+        .ground-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 5;
+        }
+
+        .ground-top {
+            height: 40px;
+            background: #8b5a2b;
+            border-top: 8px solid #228b22;
+        }
+
+        .ground-bottom {
+            height: 80px;
+            background: repeating-linear-gradient(90deg,
+                    #cd853f 0px,
+                    #cd853f 40px,
+                    #8b4513 40px,
+                    #8b4513 80px);
+        }
+
+        /* Platforms */
+        .platform {
+            position: fixed;
+            z-index: 6;
+        }
+
+        .platform-block {
+            width: 40px;
+            height: 40px;
+            background: #cd853f;
+            border: 4px solid #8b4513;
+            display: inline-block;
+        }
+
+        .platform-1 {
+            bottom: 120px;
+            right: 10%;
+        }
+
+        .platform-2 {
+            bottom: 200px;
+            left: 5%;
+        }
+
+        /* Question Blocks */
+        .question-block {
+            width: 40px;
+            height: 40px;
+            background: #ffc107;
+            border: 4px solid #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            animation: blockBounce 1s ease-in-out infinite;
+            position: fixed;
+            z-index: 7;
         }
 
+        .question-block-1 {
+            bottom: 250px;
+            left: 15%;
+        }
+
+        .question-block-2 {
+            bottom: 160px;
+            right: 8%;
+        }
+
+        @keyframes blockBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Mario Sprite Animation */
+        .mario {
+            position: fixed;
+            bottom: 125px;
+            width: 35px;
+            height: 47px;
+            background-image: url('/mario_spritesheet.png');
+            background-repeat: no-repeat;
+            image-rendering: pixelated;
+            z-index: 8;
+            animation: runMario 12s linear infinite, marioSprite 0.5s steps(8) infinite;
+        }
+
+        @keyframes marioSprite {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: -280px 0;
+            }
+        }
+
+        @keyframes runMario {
+            0% {
+                left: -50px;
+                transform: scaleX(1);
+            }
+
+            49% {
+                left: calc(100% + 50px);
+                transform: scaleX(1);
+            }
+
+            50% {
+                left: calc(100% + 50px);
+                transform: scaleX(-1);
+            }
+
+            99% {
+                left: -50px;
+                transform: scaleX(-1);
+            }
+
+            100% {
+                left: -50px;
+                transform: scaleX(1);
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 20px 200px;
+            text-align: center;
+        }
+
+        /* Join Screen - Pixel Style Panel */
         #joinScreen {
-            background: white;
-            border-radius: 20px;
+            background: #e8d4a8;
+            border: 8px solid #8b4513;
             padding: 40px;
             max-width: 400px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 8px 8px 0px #000;
+            position: relative;
+        }
+
+        /* Pixel corner decorations */
+        #joinScreen::before,
+        #joinScreen::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #ffc107;
+            border: 4px solid #000;
+        }
+
+        #joinScreen::before {
+            top: -12px;
+            left: -12px;
+        }
+
+        #joinScreen::after {
+            top: -12px;
+            right: -12px;
         }
 
         h1 {
-            color: #667eea;
+            color: #5a3a2a;
+            text-shadow: 3px 3px 0px #000;
             margin-bottom: 10px;
+            font-size: 20px;
         }
 
         .subtitle {
-            color: #666;
+            color: #fff;
+            text-shadow: 2px 2px 0px #000;
             margin-bottom: 30px;
+            font-size: 10px;
         }
 
         input {
             width: 100%;
             padding: 15px;
-            font-size: 18px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Press Start 2P', cursive;
+            border: 4px solid #000;
+            border-radius: 0;
             margin-bottom: 15px;
             text-align: center;
             text-transform: uppercase;
+            background: #fff;
         }
 
         input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffc107;
+            background: #fffde7;
+        }
+
+        input::placeholder {
+            color: #999;
+            font-size: 10px;
         }
 
         button {
             width: 100%;
-            padding: 15px;
-            font-size: 18px;
+            padding: 18px;
+            font-size: 14px;
+            font-family: 'Press Start 2P', cursive;
             font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: 4px solid #000;
+            border-radius: 0;
+            background: #228b22;
             color: white;
             cursor: pointer;
-            transition: transform 0.2s;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
         }
 
         button:hover {
-            transform: translateY(-2px);
+            background: #2e8b57;
+        }
+
+        button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px #000;
         }
 
         .error {
-            color: red;
+            color: #ff6b6b;
             margin-top: 15px;
-            font-size: 14px;
+            font-size: 10px;
+            text-shadow: 1px 1px 0px #000;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 16px;
+            }
+
+            .subtitle {
+                font-size: 8px;
+            }
+
+            input {
+                font-size: 12px;
+                padding: 12px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 15px;
+            }
+
+            .question-block-1 {
+                left: 5%;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div id="joinScreen">
-        <h1>🎮 Tham Gia Phòng</h1>
-        <p class="subtitle">Nhập mã phòng để chơi</p>
+    <!-- Clouds -->
+    <div class="clouds-container">
+        <div class="cloud cloud-1">
+            <div class="cloud-top-left"></div>
+            <div class="cloud-top-right"></div>
+            <div class="cloud-bottom"></div>
+            <div class="cloud-fill"></div>
+        </div>
+        <div class="cloud cloud-2">
+            <div class="cloud-top-left"></div>
+            <div class="cloud-top-right"></div>
+            <div class="cloud-bottom"></div>
+            <div class="cloud-fill"></div>
+        </div>
+        <div class="cloud cloud-3">
+            <div class="cloud-top-left"></div>
+            <div class="cloud-top-right"></div>
+            <div class="cloud-bottom"></div>
+            <div class="cloud-fill"></div>
+        </div>
+    </div>
 
-        <input type="text" id="roomCode" placeholder="Mã 4 số" maxlength="4">
-        <input type="text" id="nickname" placeholder="Tên của bạn">
-        <button onclick="joinRoom()">Tham Gia</button>
+    <!-- Question Blocks -->
+    <div class="question-block question-block-1">?</div>
+    <div class="question-block question-block-2">?</div>
 
-        <p id="error" class="error"></p>
+    <!-- Platforms -->
+    <div class="platform platform-1">
+        <div class="platform-block"></div>
+        <div class="platform-block"></div>
+        <div class="platform-block"></div>
+    </div>
+    <div class="platform platform-2">
+        <div class="platform-block"></div>
+        <div class="platform-block"></div>
+    </div>
+
+    <!-- Mario -->
+    <div class="mario"></div>
+
+    <!-- Ground -->
+    <div class="ground-container">
+        <div class="ground-top"></div>
+        <div class="ground-bottom"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div id="joinScreen">
+            <h1>🎮 THAM GIA PHÒNG</h1>
+            <p class="subtitle">Nhập mã phòng để chơi</p>
+
+            <input type="text" id="roomCode" placeholder="Mã 4 số" maxlength="4">
+            <input type="text" id="nickname" placeholder="Tên của bạn">
+            <button onclick="joinRoom()">▶ THAM GIA</button>
+
+            <p id="error" class="error"></p>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
