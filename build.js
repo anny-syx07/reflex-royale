@@ -88,7 +88,12 @@ function imageToBase64(imagePath) {
 
 // Process and copy images with hashed names
 function processImages() {
-    const extensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico'];
+    const extensions = [
+        '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico', // Images
+        '.otf', '.ttf', '.woff', '.woff2', '.eot', // Fonts
+        '.mp3', '.wav', '.ogg', // Audio
+        '.mp4', '.webm' // Video
+    ];
 
     function processDir(srcDir, destDir, relativePath = '') {
         if (!fs.existsSync(srcDir)) return;
