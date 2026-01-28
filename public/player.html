@@ -449,12 +449,21 @@
     <!-- Main Content -->
     <div class="main-content">
         <div id="joinScreen">
-            <h1>🎮 THAM GIA PHÒNG</h1>
-            <p class="subtitle">Nhập mã phòng để chơi</p>
+            <div id="step1">
+                <h1>🎮 THAM GIA PHÒNG</h1>
+                <p class="subtitle">Nhập mã phòng để chơi</p>
+                <input type="text" id="roomCode" placeholder="Mã 4 số" maxlength="4">
+                <button onclick="nextStep()">TIẾP TỤC ▶</button>
+            </div>
 
-            <input type="text" id="roomCode" placeholder="Mã 4 số" maxlength="4">
-            <input type="text" id="nickname" placeholder="Tên của bạn">
-            <button onclick="joinRoom()">▶ THAM GIA</button>
+            <div id="step2" style="display: none;">
+                <h1>👤 TÊN CỦA BẠN</h1>
+                <p class="subtitle">Nhập tên để mọi người biết bạn là ai</p>
+                <input type="text" id="nickname" placeholder="Tên hiển thị">
+                <button onclick="joinRoom()">VÀO GAME 🚀</button>
+                <button onclick="prevStep()"
+                    style="margin-top: 10px; background: #666; font-size: 10px; padding: 10px;">⬅ QUAY LẠI</button>
+            </div>
 
             <p id="error" class="error"></p>
         </div>
@@ -463,23 +472,76 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        let currentRoomCode = '';
+
+        // Check URL params on load (QR Code scan)
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('roomCode');
+            if (code) {
+                currentRoomCode = code;
+                document.getElementById('roomCode').value = code;
+                // Auto skip to step 2
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+            }
+        };
+
+        function nextStep() {
+            const codeInput = document.getElementById('roomCode').value.trim().toUpperCase();
+            const errorEl = document.getElementById('error');
+
+            if (codeInput.length < 4) {
+                errorEl.textContent = 'Mã phòng phải có 4 ký tự!';
+                return;
+            }
+
+            currentRoomCode = codeInput;
+            errorEl.textContent = '';
+
+            // Switch to step 2
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            document.getElementById('nickname').focus();
+        }
+
+        function prevStep() {
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('error').textContent = '';
+        }
 
         function joinRoom() {
-            const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
+            const roomCode = currentRoomCode || document.getElementById('roomCode').value.trim().toUpperCase();
             const nickname = document.getElementById('nickname').value.trim() || 'Player';
             const errorEl = document.getElementById('error');
 
             if (!roomCode) {
                 errorEl.textContent = 'Vui lòng nhập mã phòng!';
+                document.getElementById('step1').style.display = 'block';
+                document.getElementById('step2').style.display = 'none';
                 return;
             }
 
-            errorEl.textContent = '';
+            if (!nickname) {
+                errorEl.textContent = 'Vui lòng nhập tên!';
+                return;
+            }
+
+            errorEl.textContent = 'Đang kết nối...';
 
             // Check room mode
             socket.emit('checkRoomMode', { roomCode }, (response) => {
                 if (response.error) {
                     errorEl.textContent = response.error;
+                    // Provide option to go back if room code invalid
+                    if (response.error.includes('không tồn tại')) {
+                        setTimeout(() => {
+                            if (confirm('Mã phòng không đúng, bạn có muốn nhập lại?')) {
+                                prevStep();
+                            }
+                        }, 1000);
+                    }
                     return;
                 }
 
@@ -501,13 +563,11 @@
         }
 
         // Allow Enter key
+        document.getElementById('roomCode').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') nextStep();
+        });
         document.getElementById('nickname').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') joinRoom();
-        });
-        document.getElementById('roomCode').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('nickname').focus();
-            }
         });
     </script>
 </body>

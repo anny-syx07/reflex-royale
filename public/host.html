@@ -124,7 +124,10 @@
             width: 90%;
             /* Padding defines the safe area for inner board: Top Right Bottom Left */
             padding: 80px 40px 90px 35px;
-            animation: slideUpFade 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(2);
+            /* Permanent scale */
+            transform-origin: center;
+            animation: slideUpFade 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         /* Enhanced entrance animation */
@@ -136,7 +139,7 @@
 
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0) scale(1.25);
             }
         }
 
@@ -387,10 +390,11 @@
             height: 56px;
             border: none;
             cursor: pointer;
-            background: url('/images/btn-start.png') center/contain no-repeat;
+            background: none;
+            /* Removed background image */
             font-size: 0;
             position: relative;
-            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+            /* filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4)); Removed drop-shadow */
             opacity: 0;
             visibility: hidden;
             transform: translateX(30px) scale(0.8);
@@ -429,25 +433,38 @@
             opacity: 0.5;
         }
 
-        .btn:hover:not(:disabled) {
-            transform: translateY(-4px);
-            filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
-        }
-
-        .btn:active:not(:disabled) {
-            transform: translateY(2px);
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-        }
-
-        .btn:active:not(:disabled)::before {
-            width: 95%;
-            opacity: 1;
+        .btn:active:not(:disabled) .btn-main {
+            transform: translate(4px, 4px);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            filter: grayscale(1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            filter: grayscale(1);
+        }
+
+        /* Shadow Layer - Absolute to not affect layout */
+        .btn-shadow {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0) opacity(0.5);
+            z-index: 1;
+        }
+
+        /* Main Image Layer - Absolute to not affect layout */
+        .btn-main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 2;
+            transition: transform 0.1s;
         }
 
         /* Responsive Design */
@@ -521,7 +538,8 @@
                         </div>
 
                         <button class="btn" id="startBtn" disabled onclick="startGame()">
-                            Chọn game để bắt đầu
+                            <img src="/images/btn-start.png" class="btn-shadow" alt="">
+                            <img src="/images/btn-start.png" class="btn-main" alt="Start">
                         </button>
                     </div>
                 </div>
@@ -556,9 +574,11 @@
             btn.disabled = false;
 
             if (mode === 'reflex') {
-                btn.textContent = '⚡ Tạo Phòng Phản Xạ Cực Nhanh';
+                // btn.textContent = '⚡ Tạo Phòng Phản Xạ Cực Nhanh';
+                btn.title = 'Tạo Phòng Phản Xạ Cực Nhanh';
             } else {
-                btn.textContent = '🏛️ Tạo Phòng Đại Chiến Giảng Đường';
+                // btn.textContent = '🏛️ Tạo Phòng Đại Chiến Giảng Đường';
+                btn.title = 'Tạo Phòng Đại Chiến Giảng Đường';
             }
         }
 

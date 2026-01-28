@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campus Conquest - Host</title>
     <link rel="stylesheet" href="/css/conquest.css">
+    <link rel="stylesheet" href="/css/qr-modal.css">
     <style>
         body {
             margin: 0;
@@ -207,9 +208,12 @@
         <div class="panel room-code-display">
             <div>Mã Phòng</div>
             <div class="room-code" id="roomCode">------</div>
-            <canvas id="qrCode"
-                style="margin: 10px auto; display: block; max-width: 150px; border-radius: 8px;"></canvas>
-            <div style="font-size: 14px;">Quét QR hoặc nhập mã</div>
+
+            <!-- QR Icon Button -->
+            <button class="qr-icon-btn" onclick="openQrModal()" title="Hiện mã QR">
+                <img src="/images/icon-qr.png" alt="QR Code">
+            </button>
+            <div style="font-size: 14px;">Nhập mã hoặc quét QR</div>
         </div>
 
         <div class="panel">
@@ -237,6 +241,27 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/conquest-game.js"></script>
     <script src="/js/conquest-host.js"></script>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="qr-modal" onclick="closeQrModal()">
+        <div class="qr-modal-content" onclick="event.stopPropagation()">
+            <div class="qr-modal-close" onclick="closeQrModal()">&times;</div>
+            <div class="qr-modal-title">QUÉT MÃ ĐỂ VÀO PHÒNG</div>
+            <canvas id="qrCode"></canvas>
+            <div class="qr-room-code">MÃ: <span id="modalRoomCode">------</span></div>
+        </div>
+    </div>
+
+    <script>
+        function openQrModal() {
+            document.getElementById('qrModal').classList.add('show');
+            document.getElementById('modalRoomCode').textContent = document.getElementById('roomCode').textContent;
+        }
+
+        function closeQrModal() {
+            document.getElementById('qrModal').classList.remove('show');
+        }
+    </script>
 </body>
 
 </html>
