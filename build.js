@@ -12,32 +12,32 @@ const DIST_DIR = path.join(__dirname, 'dist');
 // Obfuscation options for JavaScript
 const obfuscatorOptions = {
     compact: true,
-    controlFlowFlattening: true,
+    controlFlowFlattening: false, // Reduced for performance
     controlFlowFlatteningThreshold: 0.5,
-    deadCodeInjection: true,
+    deadCodeInjection: false, // Reduced for performance
     deadCodeInjectionThreshold: 0.2,
     debugProtection: false,
     disableConsoleOutput: false,
     identifierNamesGenerator: 'hexadecimal',
     log: false,
-    numbersToExpressions: true,
+    numbersToExpressions: false, // Reduced
     renameGlobals: false,
     selfDefending: false,
     simplify: true,
-    splitStrings: true,
-    splitStringsChunkLength: 5,
+    splitStrings: false, // Reduced
+    splitStringsChunkLength: 10,
     stringArray: true,
-    stringArrayCallsTransform: true,
-    stringArrayEncoding: ['base64'],
+    stringArrayCallsTransform: false, // Reduced
+    stringArrayEncoding: ['none'],
     stringArrayIndexShift: true,
     stringArrayRotate: true,
     stringArrayShuffle: true,
-    stringArrayWrappersCount: 2,
+    stringArrayWrappersCount: 1,
     stringArrayWrappersChainedCalls: true,
-    stringArrayWrappersParametersMaxCount: 4,
-    stringArrayWrappersType: 'function',
-    stringArrayThreshold: 0.75,
-    transformObjectKeys: true,
+    stringArrayWrappersParametersMaxCount: 2,
+    stringArrayWrappersType: 'variable',
+    stringArrayThreshold: 0.5, // Reduced
+    transformObjectKeys: false, // Reduced
     unicodeEscapeSequence: false
 };
 
