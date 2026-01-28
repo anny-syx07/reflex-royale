@@ -124,9 +124,10 @@
         /* UI Board Frame Container */
         .board-frame {
             position: relative;
-            max-width: 700px;
+            max-width: 600px;
             width: 90%;
-            padding: 40px 20px;
+            /* Padding defines the safe area for inner board: Top Right Bottom Left */
+            padding: 80px 40px 90px 35px;
             animation: slideUpFade 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -212,7 +213,7 @@
         .board-inner {
             position: relative;
             z-index: 1;
-            background: rgba(20, 60, 80, 0.3);
+            background: rgba(139, 90, 43, 0.5);
             backdrop-filter: blur(5px) saturate(150%);
             -webkit-backdrop-filter: blur(5px) saturate(150%);
             padding: 20px 30px;
@@ -237,13 +238,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 50px;
+            gap: 20px;
+            /* Reduced from 50px */
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
         }
 
         .content-wrapper.has-selection {
-            justify-content: flex-start;
-            transform: translateX(-40px);
+            justify-content: center;
+            /* Keep centered or uses flex-start if needed */
+            /* transform: translateX(-40px); REMOVED to prevent shift */
         }
 
         h1 {
@@ -260,7 +264,7 @@
 
         /* Layered text effect - Extrude background */
         h1::before {
-            content: 'CHỌN CHẾ ĐỘ';
+            content: 'SELECT MODE';
             position: absolute;
             top: 0;
             left: 30px;
@@ -271,7 +275,7 @@
 
         /* Main text foreground */
         h1::after {
-            content: 'CHỌN CHẾ ĐỘ';
+            content: 'SELECT MODE';
             position: absolute;
             top: 0;
             left: 30px;
@@ -291,7 +295,8 @@
         /* Game Selection Grid */
         .game-selection {
             display: flex;
-            gap: 100px;
+            gap: 30px;
+            /* Reduced from 100px */
             justify-content: center;
             align-items: center;
             flex-wrap: nowrap;
@@ -492,7 +497,7 @@
     <div class="main-container">
         <!-- UI Board Frame -->
         <div class="board-frame">
-            <h1 style="color: transparent;">CHỌN CHẾ ĐỘ</h1>
+            <h1 style="color: transparent;">SELECT MODE</h1>
 
             <!-- Dark teal transparent overlay with blur -->
             <div class="board-inner">
