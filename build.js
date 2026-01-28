@@ -303,7 +303,10 @@ async function build() {
     console.log('');
 
     console.log('✨ Build complete! Code is now HEAVILY OBFUSCATED!');
-    console.log('📁 Files are in dist/ folder');
+    console.log('files are in dist/ folder');
 }
 
-build().catch(console.error);
+build().catch(err => {
+    console.error(err);
+    process.exit(1);
+});
