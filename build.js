@@ -80,7 +80,17 @@ function imageToBase64(imagePath) {
         '.jpeg': 'image/jpeg',
         '.gif': 'image/gif',
         '.svg': 'image/svg+xml',
-        '.webp': 'image/webp'
+        '.webp': 'image/webp',
+        '.otf': 'font/otf',
+        '.ttf': 'font/ttf',
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2',
+        '.eot': 'application/vnd.ms-fontobject',
+        '.mp3': 'audio/mpeg',
+        '.wav': 'audio/wav',
+        '.ogg': 'audio/ogg',
+        '.mp4': 'video/mp4',
+        '.webm': 'video/webm'
     };
     const mime = mimeTypes[ext] || 'application/octet-stream';
     return `data:${mime};base64,${data.toString('base64')}`;
@@ -113,8 +123,10 @@ function processImages() {
                 const fileSize = stat.size;
                 const originalRelPath = (relativePath ? relativePath + '/' : '') + item;
 
-                // Small images (< 50KB) -> Base64 inline
-                if (fileSize < 50000) {
+                // Small images (< 50KB) -> Base64 inline (EXCEPT FONTS/MEDIA)
+                const isFontOrMedia = ['.otf', '.ttf', '.woff', '.woff2', '.eot', '.mp3', '.wav', '.ogg', '.mp4', '.webm'].includes(ext);
+
+                if (fileSize < 50000 && !isFontOrMedia) {
                     const base64 = imageToBase64(srcPath);
                     imageHashMap.set('/' + originalRelPath, base64);
                     console.log(`📦 Inlined (base64): ${item} (${(fileSize / 1024).toFixed(1)}KB)`);
