@@ -284,6 +284,10 @@ async function processJsFiles() {
 async function build() {
     console.log('🔨 Building with ADVANCED OBFUSCATION...\n');
 
+    if (fs.existsSync(DIST_DIR)) {
+        console.log('🧹 Cleaning dist directory...');
+        fs.rmSync(DIST_DIR, { recursive: true, force: true });
+    }
     ensureDistDir();
 
     console.log('📸 Processing images...');
