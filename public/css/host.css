@@ -1,5 +1,7 @@
 body {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: 
+        linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.85)),
+        url('/images/umt-campus-bg.png') center/cover no-repeat fixed;
     min-height: 100vh;
     display: flex;
     align-items: center;

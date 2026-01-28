@@ -16,6 +16,28 @@
             box-sizing: border-box;
         }
 
+        @font-face {
+            font-family: 'Pixel Game';
+            src: url('/assets/font/Pixel Game.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+            font-smooth: never;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale
+        }
+
+        @font-face {
+            font-family: 'Pixel Game Extrude';
+            src: url('/assets/font/Pixel Game Extrude.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+            font-smooth: never;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale
+        }
+
         body {
             font-family: 'Press Start 2P', cursive;
             background-color: #5c94fc;
@@ -95,7 +117,7 @@
         /* Pixel-style RPG Dialog Panel - Using custom wooden frame */
         .content-panel {
             border: none;
-            padding: 140px 80px;
+            padding: 100px 60px;
             /* Large padding to fit content inside */
             max-width: 700px;
             min-height: 300px;
@@ -145,15 +167,60 @@
             /* Nằm DƯỚI khung board */
         }
 
-        .title {
-            font-size: 48px;
-            color: #fff;
-            text-shadow: 4px 4px 0px #000, 5px 5px 0px #000, 6px 6px 0px #000;
-            /* Bóng đen dày */
+        .title-wrapper {
+            position: relative;
             margin-top: 30px;
-            /* 👈 Đẩy title xuống 50px */
-            margin-bottom: 30px;
+            margin-bottom: 0px;
             animation: bounceTitle 0.6s ease-out;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .title-extrude {
+            font-family: 'Pixel Game Extrude', 'Press Start 2P', cursive;
+            font-size: 128px;
+            font-weight: 400;
+            color: #25343F;
+            /* Dark Blue-Grey for extrude/shadow */
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            letter-spacing: 4px;
+            white-space: nowrap;
+            font-smooth: never;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .title {
+            font-family: 'Pixel Game', 'Press Start 2P', cursive;
+            font-size: 128px;
+            font-weight: 400;
+            /* Custom Gradient: #FFEF5F (Yellow) -> #F16D34 (Red-Orange) */
+            background: linear-gradient(180deg, #FFEF5F 0%, #F16D34 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+            z-index: 2;
+            letter-spacing: 4px;
+            white-space: nowrap;
+            font-smooth: never;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            text-shadow: none;
+            /* Gradient text shouldn't have shadow, the Extrude layer handles depth */
+            margin: 0;
+            animation: none;
+            /* Animation moved to wrapper */
         }
 
         @keyframes bounceTitle {
@@ -173,14 +240,14 @@
         }
 
         .subtitle {
-            font-size: 14px;
+            font-size: 16px;
             color: #ffe4c4;
             /* Màu kem */
             text-shadow: 2px 2px 0px #000;
             /* Bóng đen để dễ đọc */
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             /* 👈 Giảm khoảng cách với button */
-            line-height: 2;
+            line-height: 1.5;
             max-width: 600px;
         }
 
@@ -392,8 +459,10 @@
 
         /* Mobile responsive */
         @media (max-width: 768px) {
-            .title {
-                font-size: 28px;
+
+            .title,
+            .title-extrude {
+                font-size: 72px;
             }
 
             .subtitle {
@@ -426,8 +495,9 @@
                 font-size: 14px;
             }
 
-            .title {
-                font-size: 20px;
+            .title,
+            .title-extrude {
+                font-size: 56px;
             }
         }
     </style>
@@ -456,7 +526,10 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="content-panel">
-            <h1 class="title">GAME HUB</h1>
+            <div class="title-wrapper">
+                <span class="title-extrude">GAME HUB</span>
+                <h1 class="title">GAME HUB</h1>
+            </div>
             <p class="subtitle">
                 UMT's realtime gaming platform.<br>
                 Learn while you play, play while you learn!
@@ -464,8 +537,8 @@
 
             <div class="buttons-container">
                 <a href="/player.html" class="btn-join-room">
-                    <img src="/btn-join-room.png" alt="" class="btn-shadow">
-                    <img src="/btn-join-room.png" alt="JOIN ROOM" class="btn-main">
+                    <img src="/btn-join-now.png" alt="" class="btn-shadow">
+                    <img src="/btn-join-now.png" alt="JOIN ROOM" class="btn-main">
                 </a>
             </div>
         </div>

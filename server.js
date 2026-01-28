@@ -66,7 +66,12 @@ const generalLimiter = rateLimit({
   max: 200, // 200 requests per 15 minutes
   message: { error: 'Quá nhiều request, thử lại sau 15 phút!' },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for localhost in development
+    const isLocalhost = req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === '::ffff:127.0.0.1';
+    return !isProduction && isLocalhost;
+  }
 });
 
 // Strict Rate Limiting for authentication
@@ -75,7 +80,12 @@ const authLimiter = rateLimit({
   max: 5, // 5 attempts per minute
   message: { error: 'Quá nhiều lần thử, đợi 1 phút!' },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for localhost in development
+    const isLocalhost = req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === '::ffff:127.0.0.1';
+    return !isProduction && isLocalhost;
+  }
 });
 
 // Apply general rate limiting
