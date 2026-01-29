@@ -252,7 +252,11 @@ const rooms = new Map();
 // ============================================================================
 // INITIALIZE EVENT HANDLERS
 // ============================================================================
-analyticsHandler.init(firebaseHelpers);
+analyticsHandler.init({
+  trackPlayer,
+  updatePlayerScore,
+  saveGameResult
+});
 leaderboardHandler.init(io, rooms);
 console.log('🚀 EventBus handlers initialized');
 

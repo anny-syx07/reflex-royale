@@ -48,7 +48,7 @@ function registerListeners() {
 
         // Update final scores for all players
         for (const player of leaderboard) {
-            await updatePlayerScore(player.id, player.score);
+            await updatePlayerScore(player.id, player.score, player.nickname);
         }
     });
 }
