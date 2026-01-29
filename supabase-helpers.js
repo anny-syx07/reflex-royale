@@ -12,9 +12,9 @@ async function trackPlayer(playerId, nickname) {
     try {
         // Upsert player: update username/score if exists, otherwise insert
         // Note: usage of 'on_conflict' requires a unique constraint on the conflict column
-        // We assume 'username' or 'id' is unique. 
+        // We assume 'username' or 'id' is unique.
         // Since playerId in socket.io changes, we might want to track by 'username' if we want persistence across sessions?
-        // Or if we strictly use socket.id, it resets every time. 
+        // Or if we strictly use socket.id, it resets every time.
         // The original firebase code used 'playerId'(socket.id) as doc ID.
         // But for SQL, we might want to use 'username' as the unique key if we want long-term stats.
         // Let's stick to 'username' as the key for persistent stats, or map socketID to a user.
@@ -40,7 +40,7 @@ async function trackPlayer(playerId, nickname) {
 /**
  * Update player score
  * @param {string} playerId - Socket ID (we might need to look up username or pass username)
- * @param {number} scoreGained 
+ * @param {number} scoreGained
  * @param {string} nickname - (Optional) needed if we track by username
  */
 async function updatePlayerScore(playerId, scoreGained, nickname) {
@@ -70,33 +70,36 @@ async function saveGameResult(gameId, gameMode, roomCode, players, winner) {
     console.log(`[Supabase] Saving game ${gameId}...`);
 
     try {
-        // Find host and winner IDs if they exist in players table
-        // For now, we'll just store the text data or null if not found
-        // To strictly link foreign keys, we need valid UUIDs from players table. 
-        // This might be complex if players aren't fully synced.
+        let winnerId = null;
 
-        // Simplified approach: Create a row in game_sessions
-        // We need to extend the table to support room_code, mode, and raw json data
+        // 1. Try to find the winner's UUID in the 'players' table
+        if (winner && winner.nickname) {
+            const { data: winnerData } = await supabase
+                .from('players')
+                .select('id')
+                .eq('username', winner.nickname)
+                .single();
 
+            if (winnerData) {
+                winnerId = winnerData.id;
+            }
+        }
+
+        // 2. Insert game session
         const { error } = await supabase
             .from('game_sessions')
             .insert({
-                // id: gameId, // If gameId is not UUID, let postgres generate one, or ensure gameId is UUID
                 status: 'finished',
-                // For now, we omit host_id/winner_id FKs if we don't have their UUIDs easily
-                // We'll rely on the JSON data for details
-                // We need to ADD columns for room_code and game_data to the table!
-                // Assuming we will run a migration to add these columns.
                 room_code: roomCode,
-                mode: gameMode,
+                mode: gameMode || 'REFLEX',
+                winner_id: winnerId,
                 game_data: { players, winner, gameId }
             });
 
         if (error) {
-            // If error is about missing columns, we might need to update schema
             console.error('Supabase saveGameResult SQL error:', error.message);
         } else {
-            console.log('✅ [Supabase] Game saved!');
+            console.log('✅ [Supabase] Game saved with Winner ID:', winnerId);
         }
 
     } catch (error) {
