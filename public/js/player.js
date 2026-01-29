@@ -41,6 +41,7 @@ const feedback = document.getElementById('feedback');
 const urlParams = new URLSearchParams(window.location.search);
 const urlRoomCode = urlParams.get('roomCode');
 const urlNickname = urlParams.get('nickname');
+const urlAvatar = urlParams.get('avatar');
 
 if (urlRoomCode && urlNickname) {
     roomCodeInput.value = urlRoomCode;
@@ -52,13 +53,15 @@ if (urlRoomCode && urlNickname) {
 joinBtn.addEventListener('click', () => {
     const code = roomCodeInput.value.trim().toUpperCase();
     const nickname = nicknameInput.value.trim() || 'Player' + Math.floor(Math.random() * 1000);
+    // Use URL param avatar or generate one if missing (fallback)
+    const avatar = urlAvatar || `https://api.dicebear.com/9.x/pixel-art/png?seed=${encodeURIComponent(nickname)}`;
 
     if (!code || code.length !== 4) {
         showError('Vui lòng nhập mã phòng 4 số!');
         return;
     }
 
-    socket.emit('joinRoom', { roomCode: code, nickname });
+    socket.emit('joinRoom', { roomCode: code, nickname, avatar });
 });
 
 // Enter key to join

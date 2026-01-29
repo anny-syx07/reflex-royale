@@ -5,7 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Player - Reflex Royale</title>
-    <!-- Google Fonts - Press Start 2P for pixel style -->
+    <!-- Custom Font -->
+    <style>
+        @font-face {
+            font-family: 'kvn-97';
+            src: url('assets/font/kvn-97.ttf') format('truetype');
+        }
+    </style>
+    <!-- Google Fonts - Press Start 2P for pixel style (backup) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -17,7 +24,7 @@
         }
 
         body {
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'kvn-97', 'Press Start 2P', cursive;
             background-color: #5c94fc;
             /* Super Mario Sky Blue */
             min-height: 100vh;
@@ -321,7 +328,7 @@
             width: 100%;
             padding: 15px;
             font-size: 14px;
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'kvn-97', 'Press Start 2P', cursive;
             border: 4px solid #000;
             border-radius: 0;
             margin-bottom: 15px;
@@ -345,7 +352,7 @@
             width: 100%;
             padding: 18px;
             font-size: 14px;
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'kvn-97', 'Press Start 2P', cursive;
             font-weight: bold;
             border: 4px solid #000;
             border-radius: 0;
@@ -459,6 +466,10 @@
             <div id="step2" style="display: none;">
                 <h1>👤 TÊN CỦA BẠN</h1>
                 <p class="subtitle">Nhập tên để mọi người biết bạn là ai</p>
+                <div style="margin-bottom: 15px; display: flex; justify-content: center;">
+                    <img id="avatarPreview" src="https://api.dicebear.com/9.x/pixel-art/png?seed=Player" alt="Avatar"
+                        style="width: 80px; height: 80px; border: 4px solid #000; background: #fff;">
+                </div>
                 <input type="text" id="nickname" placeholder="Tên hiển thị">
                 <button onclick="joinRoom()">VÀO GAME 🚀</button>
                 <button onclick="prevStep()"
@@ -546,9 +557,11 @@
                 }
 
                 // Redirect to appropriate game page with params
+                const avatarUrl = document.getElementById('avatarPreview').src;
                 const params = new URLSearchParams({
                     roomCode,
-                    nickname
+                    nickname,
+                    avatar: avatarUrl
                 });
 
                 let targetPage;
@@ -566,6 +579,13 @@
         document.getElementById('roomCode').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') nextStep();
         });
+        document.getElementById('nickname').addEventListener('input', (e) => {
+            const name = e.target.value.trim() || 'Player';
+            // Use encodeURIComponent to handle special characters safely
+            const seed = encodeURIComponent(name);
+            document.getElementById('avatarPreview').src = `https://api.dicebear.com/9.x/pixel-art/png?seed=${seed}`;
+        });
+
         document.getElementById('nickname').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') joinRoom();
         });

@@ -263,6 +263,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const urlRoomCode = urlParams.get('roomCode');
         const urlNickname = urlParams.get('nickname');
+        const urlAvatar = urlParams.get('avatar');
 
         if (urlRoomCode && urlNickname) {
             // Auto-join
@@ -275,13 +276,15 @@
         function joinGame() {
             roomCode = document.getElementById('roomCodeInput').value.trim().toUpperCase();
             nickname = document.getElementById('nicknameInput').value.trim() || 'Player';
+            // Use URL param avatar or generate one if missing (fallback)
+            const avatar = urlAvatar || `https://api.dicebear.com/9.x/pixel-art/png?seed=${encodeURIComponent(nickname)}`;
 
             if (!roomCode) {
                 alert('Vui lòng nhập mã phòng!');
                 return;
             }
 
-            socket.emit('joinConquestRoom', { roomCode, nickname });
+            socket.emit('joinConquestRoom', { roomCode, nickname, avatar });
         }
 
         // Socket: Successfully joined

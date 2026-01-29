@@ -54,7 +54,14 @@ socket.on('reconnectResult', ({ success, roomCode: code, gameState: state, playe
             players.forEach(player => {
                 const playerCard = document.createElement('div');
                 playerCard.className = 'player-card';
-                playerCard.textContent = player.nickname;
+                playerCard.innerHTML = `
+                    <div class="avatar-container">
+                        <img src="${player.avatar || `https://api.dicebear.com/9.x/pixel-art/png?seed=${encodeURIComponent(player.nickname)}`}" alt="Avatar" class="player-avatar">
+                    </div>
+                `;
+                const nameEl = document.createElement('div');
+                nameEl.textContent = player.nickname;
+                playerCard.appendChild(nameEl);
                 playerListEl.appendChild(playerCard);
             });
             startGameBtn.disabled = players.length === 0;
@@ -130,7 +137,14 @@ socket.on('playerListUpdate', ({ players }) => {
     players.forEach(player => {
         const playerCard = document.createElement('div');
         playerCard.className = 'player-card';
-        playerCard.textContent = player.nickname;
+        playerCard.innerHTML = `
+            <div class="avatar-container">
+                <img src="${player.avatar || `https://api.dicebear.com/9.x/pixel-art/png?seed=${encodeURIComponent(player.nickname)}`}" alt="Avatar" class="player-avatar">
+            </div>
+        `;
+        const nameEl = document.createElement('div');
+        nameEl.textContent = player.nickname;
+        playerCard.appendChild(nameEl);
         playerListEl.appendChild(playerCard);
     });
 
@@ -145,13 +159,45 @@ startGameBtn.addEventListener('click', () => {
 
 // Next round button
 nextRoundBtn.addEventListener('click', () => {
-    socket.emit('nextRound', { roomCode });
+    // Check if it's the final round
+    const currentRound = parseInt(currentRoundEl.textContent);
+    const totalRounds = parseInt(totalRoundsEl.textContent);
+
+    if (currentRound >= totalRounds) {
+        // Last round - skip delay and go straight to game over
+        socket.emit('nextRound', { roomCode });
+        return;
+    }
+
+    // Hide round display, Show leaderboard
+    document.getElementById('roundDisplay').style.display = 'none';
+    document.querySelector('.leaderboard-container').classList.remove('hidden');
+
+    // Hide the button itself to prevent double clicks
+    nextRoundBtn.style.display = 'none';
+
+    // Wait 5 seconds then start next round
+    let secondsLeft = 5;
+    const timerDisplay = document.getElementById('timerValue');
+    timerDisplay.textContent = secondsLeft;
+
+    const countdown = setInterval(() => {
+        secondsLeft--;
+        timerDisplay.textContent = secondsLeft;
+
+        if (secondsLeft <= 0) {
+            clearInterval(countdown);
+            socket.emit('nextRound', { roomCode });
+        }
+    }, 1000);
 });
 
 // Game started
 socket.on('gameStarted', () => {
     waitingScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
+    // Ensure leaderboard is hidden initially
+    document.querySelector('.leaderboard-container').classList.add('hidden');
 });
 
 // Round start
@@ -159,6 +205,10 @@ socket.on('roundStart', ({ roundNumber, totalRounds, roundType, roundData, start
     currentRoundEl.textContent = roundNumber;
     totalRoundsEl.textContent = totalRounds;
     currentRoundType = roundType;
+
+    // Reset UI for new round
+    document.querySelector('.leaderboard-container').classList.add('hidden');
+    document.getElementById('roundDisplay').style.display = 'flex'; // Restore flex display
 
     // Hide next round button when round starts
     nextRoundBtn.style.display = 'none';
@@ -318,6 +368,9 @@ socket.on('leaderboardUpdate', ({ leaderboard }) => {
         item.className = 'leaderboard-item';
         item.innerHTML = `
       <div class="rank rank-${index + 1}">#${index + 1}</div>
+      <div class="leaderboard-avatar-container">
+          <img src="${player.avatar || `https://api.dicebear.com/9.x/pixel-art/png?seed=${encodeURIComponent(player.nickname)}`}" alt="Avatar" class="player-avatar">
+      </div>
       <div class="player-name">${player.nickname}</div>
       <div class="player-score">${player.score}</div>
     `;
@@ -353,12 +406,18 @@ socket.on('gameOver', ({ finalLeaderboard }) => {
         item.className = 'leaderboard-item';
         item.innerHTML = `
       <div class="rank rank-${index + 1}">#${index + 1}</div>
+       <div class="leaderboard-avatar-container">
+          <img src="${player.avatar || `https://api.dicebear.com/9.x/pixel-art/png?seed=${encodeURIComponent(player.nickname)}`}" alt="Avatar" class="player-avatar">
+      </div>
       <div class="player-name">${player.nickname}</div>
       <div class="player-score">${player.score} điểm</div>
     `;
         finalLeaderboardEl.appendChild(item);
     });
     // Host controls when to leave - no auto-redirect
+
+    // Start confetti effect
+    startConfetti();
 });
 
 // New game - Soft reset (keep players)
@@ -387,7 +446,14 @@ socket.on('roomReset', ({ players }) => {
     players.forEach(player => {
         const playerCard = document.createElement('div');
         playerCard.className = 'player-card';
-        playerCard.textContent = player.nickname;
+        playerCard.innerHTML = `
+            <div class="avatar-container">
+                <img src="${player.avatar || `https://api.dicebear.com/9.x/pixel-art/png?seed=${encodeURIComponent(player.nickname)}`}" alt="Avatar" class="player-avatar">
+            </div>
+        `;
+        const nameEl = document.createElement('div');
+        nameEl.textContent = player.nickname;
+        playerCard.appendChild(nameEl);
         playerListEl.appendChild(playerCard);
     });
 
@@ -414,6 +480,46 @@ function cleanupHost() {
     if (socket) {
         socket.removeAllListeners();
     }
+}
+
+// Confetti Waterfall Effect
+function startConfetti() {
+    const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+    const container = document.getElementById('gameOverScreen');
+
+    // Create confetti generator
+    const interval = setInterval(() => {
+        if (!container.classList.contains('hidden')) {
+            createConfetti(container);
+        } else {
+            clearInterval(interval);
+        }
+    }, 50); // New confetti every 50ms
+
+    // Store interval to clear later if needed
+    window.confettiInterval = interval;
+}
+
+function createConfetti(container) {
+    const confetti = document.createElement('div');
+    confetti.innerHTML = '🎉';
+    confetti.className = 'confetti';
+
+    // Random positioning and styling
+    const left = Math.random() * 100;
+    const duration = Math.random() * 3 + 2; // 2-5 seconds
+    const size = Math.random() * 20 + 20; // 20-40px
+
+    confetti.style.left = `${left}%`;
+    confetti.style.animationDuration = `${duration}s`;
+    confetti.style.fontSize = `${size}px`;
+
+    container.appendChild(confetti);
+
+    // Remove after animation
+    setTimeout(() => {
+        confetti.remove();
+    }, duration * 1000);
 }
 
 // Cleanup on page unload

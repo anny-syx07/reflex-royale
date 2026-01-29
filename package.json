@@ -7,7 +7,7 @@
     "build": "node build.js",
     "start": "node server.js",
     "start:prod": "npm run build && NODE_ENV=production node server.js",
-    "dev": "node server.js"
+    "dev": "node --watch server.js"
   },
   "keywords": [
     "multiplayer",
