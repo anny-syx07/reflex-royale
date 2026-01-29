@@ -187,7 +187,10 @@ try {
   supabaseHelpers = require('./supabase-helpers');
   console.log('⚡ Supabase helpers loaded');
 } catch (error) {
-  console.log('⚠️  Supabase helpers not available');
+  console.log('⚠️  Supabase helpers not available. Reason:', error.message);
+  // Log specific env check to debug
+  if (!process.env.SUPABASE_URL) console.log('   -> Missing SUPABASE_URL');
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) console.log('   -> Missing SUPABASE_SERVICE_ROLE_KEY');
 }
 
 // Extract helper functions with fallbacks, combining both Firebase and Supabase
