@@ -172,6 +172,15 @@ const leaderboardHandler = require('./handlers/leaderboardHandler');
 // FIREBASE HELPERS
 // ============================================================================
 
+// Firebase helpers (optional - graceful fallback)
+let firebaseHelpers = null;
+try {
+  firebaseHelpers = require('./firebase-helpers');
+  console.log('🔥 Firebase helpers loaded');
+} catch (error) {
+  console.log('⚠️  Firebase helpers not available - tracking disabled');
+}
+
 // Supabase helpers
 let supabaseHelpers = null;
 try {
