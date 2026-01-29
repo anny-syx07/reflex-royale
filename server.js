@@ -172,19 +172,30 @@ const leaderboardHandler = require('./handlers/leaderboardHandler');
 // FIREBASE HELPERS
 // ============================================================================
 
-// Firebase helpers (optional - graceful fallback)
-let firebaseHelpers = null;
+// Supabase helpers
+let supabaseHelpers = null;
 try {
-  firebaseHelpers = require('./firebase-helpers');
-  console.log('🔥 Firebase helpers loaded');
+  supabaseHelpers = require('./supabase-helpers');
+  console.log('⚡ Supabase helpers loaded');
 } catch (error) {
-  console.log('⚠️  Firebase helpers not available - tracking disabled');
+  console.log('⚠️  Supabase helpers not available');
 }
 
-// Extract helper functions with fallbacks
-const trackPlayer = firebaseHelpers?.trackPlayer || (async () => { });
-const updatePlayerScore = firebaseHelpers?.updatePlayerScore || (async () => { });
-const saveGameResult = firebaseHelpers?.saveGameResult || (async () => { });
+// Extract helper functions with fallbacks, combining both Firebase and Supabase
+const trackPlayer = async (id, nickname) => {
+  if (firebaseHelpers) await firebaseHelpers.trackPlayer(id, nickname);
+  if (supabaseHelpers) await supabaseHelpers.trackPlayer(id, nickname);
+};
+
+const updatePlayerScore = async (id, score, nickname) => {
+  if (firebaseHelpers) await firebaseHelpers.updatePlayerScore(id, score);
+  if (supabaseHelpers) await supabaseHelpers.updatePlayerScore(id, score, nickname);
+};
+
+const saveGameResult = async (gameId, gameMode, roomCode, players, winner) => {
+  if (firebaseHelpers) await firebaseHelpers.saveGameResult(gameId, gameMode, roomCode, players, winner);
+  if (supabaseHelpers) await supabaseHelpers.saveGameResult(gameId, gameMode, roomCode, players, winner);
+};
 
 const PORT = process.env.PORT || 3000;
 
