@@ -274,8 +274,21 @@ const ROUND_TYPES = {
   COLOR_TAP: 'COLOR_TAP',
   SWIPE: 'SWIPE',
   SHAKE: 'SHAKE',
-  TAP_SPAM: 'TAP_SPAM'
+  TAP_SPAM: 'TAP_SPAM',
+  DONT_TAP: 'DONT_TAP',
+  QUICK_MATH: 'QUICK_MATH',
+  GYRO_BALANCE: 'GYRO_BALANCE',
+  ICON_HUNT: 'ICON_HUNT',
+  SOUND_CHECK: 'SOUND_CHECK',
+  FINAL_BLITZ: 'FINAL_BLITZ'
 };
+
+// Sound pairs for SOUND_CHECK round
+const SOUND_PAIRS = [
+  { id: 'birdsong', audio: '/assets/audio/birdsong.mp3', image: '/assets/audio/birdsong.jpg', name: 'Tiếng chim' },
+  { id: 'car-horn', audio: '/assets/audio/car-horn.mp3', image: '/assets/audio/car-horn.jpg', name: 'Còi xe' },
+  { id: 'explosion', audio: '/assets/audio/explosion.mp3', image: '/assets/audio/explosion.jpg', name: 'Tiếng nổ' }
+];
 
 const COLORS = ['RED', 'BLUE', 'YELLOW', 'PURPLE'];
 const DIRECTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
@@ -308,7 +321,7 @@ io.on('connection', (socket) => {
       players: new Map(),
       gameState: 'WAITING', // WAITING, PLAYING, FINISHED
       currentRound: 0,
-      totalRounds: 4,
+      totalRounds: 10,
       roundType: null,
       roundData: null,
       roundStartTime: null,
@@ -453,6 +466,93 @@ io.on('connection', (socket) => {
       } else {
         points = -200;
       }
+    } else if (room.roundType === ROUND_TYPES.DONT_TAP) {
+      // In DONT_TAP: response 'TAPPED' means they tapped, 'HELD' means they didn't tap
+      const tapped = response === 'TAPPED';
+      if (room.roundData.isBomb) {
+        // It's a bomb - should NOT tap
+        if (tapped) {
+          correct = false;
+          points = -500; // Heavy penalty for tapping bomb
+        } else {
+          correct = true;
+          points = 200; // Reward for holding
+        }
+      } else {
+        // It's a TAP command - should tap
+        if (tapped) {
+          correct = true;
+          points = Math.max(100, 1000 - Math.floor(responseTime * 2));
+        } else {
+          correct = false;
+          points = 0; // No penalty for not tapping when should tap
+        }
+      }
+    } else if (room.roundType === ROUND_TYPES.QUICK_MATH) {
+      // response is the number they selected
+      correct = parseInt(response) === room.roundData.correctAnswer;
+      if (correct) {
+        // Points based on speed
+        points = Math.max(100, 1000 - Math.floor(responseTime / 5));
+      } else {
+        points = 0; // Wrong answer, no points
+      }
+    } else if (room.roundType === ROUND_TYPES.ICON_HUNT) {
+      // response is the index clicked
+      const clickedIndex = parseInt(response);
+      correct = clickedIndex === room.roundData.targetPosition;
+      if (correct) {
+        // Fast response = combo bonus
+        if (responseTime < 1000) {
+          points = 1500; // Combo bonus for < 1 second
+        } else if (responseTime < 2000) {
+          points = 1000;
+        } else {
+          points = Math.max(100, 800 - Math.floor(responseTime / 10));
+        }
+      } else {
+        points = -100; // Small penalty for wrong icon
+      }
+    } else if (room.roundType === ROUND_TYPES.FINAL_BLITZ) {
+      // Parse response: { challengeIndex, answer }
+      const blitzResponse = typeof response === 'string' ? JSON.parse(response) : response;
+      const challengeIdx = blitzResponse.challengeIndex;
+      const answer = blitzResponse.answer;
+      const challenge = room.roundData.challenges[challengeIdx];
+
+      if (challenge) {
+        if (challenge.type === 'COLOR') {
+          correct = answer === challenge.color;
+        } else if (challenge.type === 'SWIPE') {
+          correct = answer === challenge.direction;
+        } else if (challenge.type === 'TAP') {
+          correct = answer === 'TAP';
+        } else if (challenge.type === 'MATH') {
+          correct = parseInt(answer) === challenge.answer;
+        }
+
+        if (correct) {
+          // 2x multiplier for final blitz
+          points = Math.max(50, 200 - Math.floor(responseTime / 20)) * room.roundData.pointMultiplier;
+        } else {
+          points = 0;
+        }
+      }
+    } else if (room.roundType === ROUND_TYPES.SOUND_CHECK) {
+      // response is the sound id they selected
+      correct = response === room.roundData.correctSoundId;
+      if (correct) {
+        // Points based on speed - faster = more points
+        if (responseTime < 1500) {
+          points = 1500; // Very fast bonus
+        } else if (responseTime < 3000) {
+          points = 1000;
+        } else {
+          points = Math.max(100, 800 - Math.floor(responseTime / 10));
+        }
+      } else {
+        points = 0; // Wrong sound, no points
+      }
     }
 
     player.score += points;
@@ -512,6 +612,27 @@ io.on('connection', (socket) => {
     room.responses.set(socket.id, {
       playerId: socket.id,
       tapCount,
+      timestamp: Date.now()
+    });
+  });
+
+  // Gyroscope balance update
+  socket.on('balanceUpdate', ({ roomCode, balanceScore, isBalanced }) => {
+    const room = rooms.get(roomCode);
+
+    if (!room || room.gameState !== 'PLAYING' || room.roundType !== ROUND_TYPES.GYRO_BALANCE) {
+      return;
+    }
+
+    const player = room.players.get(socket.id);
+    if (!player) return;
+
+    // Accumulate balance score
+    const existing = room.responses.get(socket.id) || { balanceScore: 0, balancedTicks: 0 };
+    room.responses.set(socket.id, {
+      playerId: socket.id,
+      balanceScore: existing.balanceScore + (isBalanced ? 10 : 0),
+      balancedTicks: existing.balancedTicks + (isBalanced ? 1 : 0),
       timestamp: Date.now()
     });
   });
@@ -795,16 +916,27 @@ function startNextRound(roomCode) {
   // Clear previous responses
   room.responses.clear();
 
-  // Sequential round type selection
   // Vòng 1: COLOR_TAP (Chạm Đúng Màu)
   // Vòng 2: SWIPE (Vuốt Đúng Hướng)
   // Vòng 3: SHAKE (Lắc Điên Cuồng)
   // Vòng 4: TAP_SPAM (Chạm Liên Hoàn)
+  // Vòng 5: DONT_TAP (Đừng Chạm!)
+  // Vòng 6: QUICK_MATH (Con Số May Mắn)
+  // Vòng 7: GYRO_BALANCE (Cân Bằng Tuyệt Đối)
+  // Vòng 8: ICON_HUNT (Truy Tìm Biểu Tượng)
+  // Vòng 9: SOUND_CHECK (Phản Xạ Âm Thanh)
+  // Vòng 10: FINAL_BLITZ (Vòng Về Đích)
   const roundSequence = [
     ROUND_TYPES.COLOR_TAP,
     ROUND_TYPES.SWIPE,
     ROUND_TYPES.SHAKE,
-    ROUND_TYPES.TAP_SPAM
+    ROUND_TYPES.TAP_SPAM,
+    ROUND_TYPES.DONT_TAP,
+    ROUND_TYPES.QUICK_MATH,
+    ROUND_TYPES.GYRO_BALANCE,
+    ROUND_TYPES.ICON_HUNT,
+    ROUND_TYPES.SOUND_CHECK,
+    ROUND_TYPES.FINAL_BLITZ
   ];
   const roundIndex = room.currentRound - 1;
   room.roundType = roundSequence[roundIndex];
@@ -833,6 +965,117 @@ function startNextRound(roomCode) {
         duration: 10000 // 10 seconds
       };
       break;
+    case ROUND_TYPES.DONT_TAP:
+      // 70% chance of BOMB (don't tap), 30% chance of TAP (tap it)
+      const isBomb = Math.random() < 0.7;
+      room.roundData = {
+        isBomb: isBomb,
+        command: isBomb ? 'BOMB' : 'TAP',
+        duration: 4000 // 4 seconds to react/hold
+      };
+      break;
+    case ROUND_TYPES.QUICK_MATH:
+      // Generate 4 random numbers and randomly pick min or max task
+      const numbers = [];
+      while (numbers.length < 4) {
+        const num = Math.floor(Math.random() * 99) + 1;
+        if (!numbers.includes(num)) numbers.push(num);
+      }
+      const findMin = Math.random() < 0.5;
+      const correctAnswer = findMin ? Math.min(...numbers) : Math.max(...numbers);
+      room.roundData = {
+        numbers: numbers,
+        task: findMin ? 'MIN' : 'MAX',
+        correctAnswer: correctAnswer,
+        duration: 8000 // 8 seconds
+      };
+      break;
+    case ROUND_TYPES.GYRO_BALANCE:
+      room.roundData = {
+        duration: 10000, // 10 seconds
+        tolerance: 5 // degrees tolerance
+      };
+      break;
+    case ROUND_TYPES.ICON_HUNT:
+      // Similar emoji pairs - target vs distractors
+      const iconPairs = [
+        { target: '😂', distractors: ['😊', '😄', '🙂', '😀'] },
+        { target: '🍎', distractors: ['🍏', '🍑', '🍓', '🍒'] },
+        { target: '⭐', distractors: ['✨', '💫', '🌟', '⚡'] },
+        { target: '❤️', distractors: ['💖', '💗', '💕', '💓'] },
+        { target: '🔵', distractors: ['🟦', '💙', '🔷', '🫐'] }
+      ];
+      const selectedPair = iconPairs[Math.floor(Math.random() * iconPairs.length)];
+
+      // Create 4x4 grid (16 icons) with exactly 1 target
+      const gridIcons = [];
+      const targetPosition = Math.floor(Math.random() * 16);
+
+      for (let i = 0; i < 16; i++) {
+        if (i === targetPosition) {
+          gridIcons.push(selectedPair.target);
+        } else {
+          gridIcons.push(selectedPair.distractors[Math.floor(Math.random() * selectedPair.distractors.length)]);
+        }
+      }
+
+      room.roundData = {
+        targetIcon: selectedPair.target,
+        gridIcons: gridIcons,
+        targetPosition: targetPosition,
+        duration: 8000, // 8 seconds
+        freezeDuration: 2000 // 2 second freeze on wrong answer
+      };
+      break;
+    case ROUND_TYPES.SOUND_CHECK:
+      // Pick a random sound to play
+      const correctSound = SOUND_PAIRS[Math.floor(Math.random() * SOUND_PAIRS.length)];
+
+      room.roundData = {
+        correctSoundId: correctSound.id,
+        correctSound: correctSound,
+        allSounds: SOUND_PAIRS, // Send all options to players
+        duration: 8000 // 8 seconds
+      };
+      break;
+    case ROUND_TYPES.FINAL_BLITZ:
+      // Generate 10 rapid challenges mixing different round types
+      const blitzChallenges = [];
+      const challengeTypes = ['COLOR', 'SWIPE', 'TAP', 'MATH'];
+
+      for (let i = 0; i < 10; i++) {
+        const type = challengeTypes[Math.floor(Math.random() * challengeTypes.length)];
+        let challenge = { type };
+
+        if (type === 'COLOR') {
+          challenge.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        } else if (type === 'SWIPE') {
+          challenge.direction = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+        } else if (type === 'TAP') {
+          challenge.action = 'TAP';
+        } else if (type === 'MATH') {
+          const nums = [];
+          while (nums.length < 4) {
+            const n = Math.floor(Math.random() * 99) + 1;
+            if (!nums.includes(n)) nums.push(n);
+          }
+          const findMin = Math.random() < 0.5;
+          challenge.numbers = nums;
+          challenge.task = findMin ? 'MIN' : 'MAX';
+          challenge.answer = findMin ? Math.min(...nums) : Math.max(...nums);
+        }
+
+        blitzChallenges.push(challenge);
+      }
+
+      room.roundData = {
+        challenges: blitzChallenges,
+        currentChallenge: 0,
+        duration: 30000, // 30 seconds total
+        challengeDuration: 2500, // 2.5 seconds per challenge
+        pointMultiplier: 2 // x2 points
+      };
+      break;
   }
 
   // Broadcast round start
@@ -852,6 +1095,24 @@ function startNextRound(roomCode) {
   } else if (room.roundType === ROUND_TYPES.COLOR_TAP || room.roundType === ROUND_TYPES.SWIPE) {
     // Auto-end COLOR_TAP and SWIPE after 5 seconds
     setTimeout(() => endRound(roomCode), 5000);
+  } else if (room.roundType === ROUND_TYPES.DONT_TAP) {
+    // Auto-end DONT_TAP after duration
+    setTimeout(() => endRound(roomCode), room.roundData.duration);
+  } else if (room.roundType === ROUND_TYPES.QUICK_MATH) {
+    // Auto-end QUICK_MATH after duration
+    setTimeout(() => endRound(roomCode), room.roundData.duration);
+  } else if (room.roundType === ROUND_TYPES.GYRO_BALANCE) {
+    // Auto-end GYRO_BALANCE after duration
+    setTimeout(() => endRound(roomCode), room.roundData.duration);
+  } else if (room.roundType === ROUND_TYPES.ICON_HUNT) {
+    // Auto-end ICON_HUNT after duration
+    setTimeout(() => endRound(roomCode), room.roundData.duration);
+  } else if (room.roundType === ROUND_TYPES.SOUND_CHECK) {
+    // Auto-end SOUND_CHECK after duration
+    setTimeout(() => endRound(roomCode), room.roundData.duration);
+  } else if (room.roundType === ROUND_TYPES.FINAL_BLITZ) {
+    // Auto-end FINAL_BLITZ after duration
+    setTimeout(() => endRound(roomCode), room.roundData.duration);
   }
 }
 
@@ -904,6 +1165,34 @@ function endRound(roomCode) {
     room.players.forEach((player, playerId) => {
       io.to(playerId).emit('responseResult', {
         points: player.score,
+        totalScore: player.score
+      });
+    });
+  }
+
+  // Calculate scores for GYRO_BALANCE
+  if (room.roundType === ROUND_TYPES.GYRO_BALANCE) {
+    const responsesArray = Array.from(room.responses.entries());
+    // Sort by balance score
+    responsesArray.sort((a, b) => (b[1].balanceScore || 0) - (a[1].balanceScore || 0));
+
+    responsesArray.forEach(([playerId, response], index) => {
+      const player = room.players.get(playerId);
+      if (!player) return;
+
+      // Points = accumulated balance score
+      let points = response.balanceScore || 0;
+
+      // Bonus for top 3
+      if (index === 0) points += 500;
+      else if (index === 1) points += 300;
+      else if (index === 2) points += 100;
+
+      player.score += points;
+
+      // Send feedback
+      io.to(playerId).emit('responseResult', {
+        points: points,
         totalScore: player.score
       });
     });

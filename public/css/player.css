@@ -315,6 +315,482 @@ body {
     color: white;
 }
 
+/* ============== ROUND 5: DON'T TAP ============== */
+.dont-tap-area {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.trap-zone {
+    width: 90vw;
+    height: 70vh;
+    max-width: 400px;
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    box-shadow: 0 0 60px rgba(255, 68, 68, 0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.trap-icon {
+    font-size: 8rem;
+    margin-bottom: var(--spacing-lg);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.trap-zone h2 {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    margin-bottom: var(--spacing-sm);
+}
+
+.trap-label {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ============== ROUND 6: QUICK MATH ============== */
+.quick-math-area {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: var(--spacing-lg);
+}
+
+.quick-math-area h2 {
+    font-size: 2rem;
+    color: var(--color-blue);
+    margin-bottom: var(--spacing-xl);
+    text-shadow: 0 4px 20px rgba(78, 205, 196, 0.5);
+}
+
+.number-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+    max-width: 350px;
+    width: 90%;
+}
+
+.number-btn {
+    padding: var(--spacing-xl);
+    border: none;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-lg);
+}
+
+.number-btn:active {
+    transform: scale(0.95);
+}
+
+.number-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============== ROUND 7: GYRO BALANCE ============== */
+.gyro-balance-area {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.gyro-balance-area h2 {
+    font-size: 2rem;
+    color: var(--color-purple);
+    margin-bottom: var(--spacing-xl);
+    text-shadow: 0 4px 20px rgba(167, 139, 250, 0.5);
+}
+
+.balance-container {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+}
+
+.balance-target {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px dashed var(--color-green);
+    background: rgba(78, 205, 196, 0.1);
+}
+
+.balance-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: 800;
+    color: #ff4444;
+    transition: color 0.2s ease;
+}
+
+.balance-indicator.balanced {
+    color: #44ff44;
+}
+
+.balance-score {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-yellow);
+    text-shadow: 0 4px 20px rgba(255, 230, 109, 0.5);
+}
+
+/* ============== ROUND 8: ICON HUNT ============== */
+.icon-hunt-area {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: var(--spacing-lg);
+    position: relative;
+}
+
+.icon-hunt-area h2 {
+    font-size: 2rem;
+    color: var(--color-purple);
+    margin-bottom: var(--spacing-xl);
+    text-shadow: 0 4px 20px rgba(167, 139, 250, 0.5);
+}
+
+#targetIconDisplay {
+    font-size: 3rem;
+    margin-left: var(--spacing-sm);
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-sm);
+    max-width: 360px;
+    width: 90%;
+}
+
+.icon-btn {
+    width: 80px;
+    height: 80px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:active {
+    transform: scale(0.9);
+}
+
+.freeze-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(100, 180, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.freeze-overlay span {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    animation: pulse 0.5s ease-in-out infinite;
+}
+
+/* ============== ROUND 9: FINAL BLITZ ============== */
+.final-blitz-area {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff4444 50%, #cc0000 100%);
+    padding: var(--spacing-lg);
+    animation: blitzPulse 0.5s ease-in-out infinite;
+}
+
+@keyframes blitzPulse {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.blitz-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.blitz-header h2 {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    margin-bottom: var(--spacing-sm);
+}
+
+.blitz-progress {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+    justify-content: center;
+}
+
+.blitz-progress span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.blitz-progress .multiplier {
+    background: var(--color-yellow);
+    color: #000;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-weight: 800;
+}
+
+.blitz-challenge-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.blitz-challenge-container h3 {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: var(--spacing-lg);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.blitz-color-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+    max-width: 300px;
+    width: 90%;
+}
+
+.blitz-color-btn {
+    padding: var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.blitz-red {
+    background: #ff4444;
+}
+
+.blitz-blue {
+    background: #4ecdc4;
+}
+
+.blitz-yellow {
+    background: #ffe66d;
+    color: #333;
+}
+
+.blitz-purple {
+    background: #a78bfa;
+}
+
+.blitz-tap-btn {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: #ff4444;
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+    transition: all 0.1s ease;
+}
+
+.blitz-tap-btn:active {
+    transform: scale(0.9);
+}
+
+.blitz-number-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+    max-width: 280px;
+    width: 90%;
+}
+
+.blitz-number-btn {
+    padding: var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-md);
+    background: white;
+    color: #333;
+    font-family: 'Outfit', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.blitz-number-btn:active {
+    transform: scale(0.9);
+}
+
+/* ============== ROUND 9: SOUND CHECK ============== */
+.sound-check-area {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: var(--spacing-lg);
+}
+
+.sound-check-area h2 {
+    font-size: 2.5rem;
+    color: var(--color-yellow);
+    margin-bottom: var(--spacing-xl);
+    text-shadow: 0 4px 20px rgba(255, 230, 109, 0.5);
+}
+
+.sound-player {
+    margin-bottom: var(--spacing-xl);
+}
+
+.play-sound-btn {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border: none;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+    transition: all 0.2s ease;
+}
+
+.play-sound-btn:active {
+    transform: scale(0.95);
+}
+
+.sound-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    width: 90%;
+    max-width: 350px;
+}
+
+.sound-option-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sound-option-btn:active {
+    transform: scale(0.98);
+}
+
+.sound-option-btn img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: brightness(1.2);
+}
+
+.sound-option-btn span {
+    flex: 1;
+    text-align: left;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
     .game-title {
@@ -338,5 +814,23 @@ body {
         width: 220px;
         height: 220px;
         font-size: 3rem;
+    }
+
+    .trap-icon {
+        font-size: 5rem;
+    }
+
+    .trap-zone h2 {
+        font-size: 1.8rem;
+    }
+
+    .number-btn {
+        font-size: 2rem;
+        padding: var(--spacing-lg);
+    }
+
+    .balance-container {
+        width: 220px;
+        height: 220px;
     }
 }

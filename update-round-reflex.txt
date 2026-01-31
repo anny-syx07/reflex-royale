@@ -1,0 +1,82 @@
+Để hoàn thiện trò chơi Phản Xạ Cực Nhanh (Reflex Royale) của bạn lên đủ 10 vòng, chúng ta cần thêm các cơ chế mới để tăng độ khó, sự kịch tính và tận dụng tối đa các cảm biến trên điện thoại.
+Dưới đây là gợi ý 6 vòng chơi tiếp theo để tạo thành một kịch bản hoàn chỉnh:
+
+Các Vòng Bổ Sung (Từ Vòng 5 đến Vòng 10)
+Vòng 5: Đừng Chạm! (The Trap)
+* Màn hình lớn: Hiển thị một biểu tượng (ví dụ: quả bom hoặc chữ "DỪNG"). Đôi khi nó sẽ hiện ra cùng lúc với các màu sắc để đánh lừa.
+* Người chơi: Tuyệt đối không được chạm vào bất cứ thứ gì trên màn hình trong vòng 3 giây.
+* Tính điểm: Ai giữ vững tay không chạm sẽ được điểm. Ai lỡ tay chạm (phản xạ sai) sẽ bị trừ điểm rất nặng. Đây là vòng thử thách khả năng kìm nén phản xạ.
+Vòng 6: Con Số May Mắn (Quick Math/Order)
+* Màn hình lớn: Hiện ra 4 con số ngẫu nhiên ở 4 vị trí (ví dụ: 12, 45, 08, 99).
+* Người chơi: Trên điện thoại sẽ hiện đúng 4 con số đó nhưng bị đảo thứ tự. Người chơi phải chạm vào con số nhỏ nhất (hoặc lớn nhất) theo yêu cầu trên màn hình lớn.
+* Tính điểm: Đòi hỏi sự kết hợp giữa mắt nhìn và não bộ xử lý thông tin nhanh.
+Vòng 7: Cân Bằng Tuyệt Đối (Keep It Steady)
+* Màn hình lớn: Hiển thị một quả cầu đang lăn trên một thanh gỗ ảo và yêu cầu "GIỮ THĂNG BẰNG!".
+* Người chơi: Phải cầm ngang điện thoại và giữ cho nó thật phẳng (sử dụng cảm biến con quay hồi chuyển). Trên màn hình điện thoại sẽ có một tâm điểm, người chơi phải giữ chấm tròn nằm trong tâm đó.
+* Tính điểm: Điểm cộng dồn dựa trên số giây người chơi giữ được điện thoại ở trạng thái cân bằng hoàn hảo.
+Vòng 8: Truy Tìm Biểu Tượng (Icon Hunt)
+* Màn hình lớn: Hiển thị một biểu tượng cụ thể giữa một rừng các biểu tượng gần giống nhau (ví dụ: tìm icon "Cười ra nước mắt" giữa một loạt icon "Cười mỉm").
+* Người chơi: Màn hình điện thoại hiện ra danh sách các icon. Phải chọn đúng icon mục tiêu.
+* Tính điểm: Thử thách khả năng quan sát chi tiết trong thời gian cực ngắn.
+Vòng 9: Phản Xạ Âm Thanh (Sound Check)
+* Màn hình lớn: Hiện thông báo "NGHE LỆNH!". Loa hội trường phát ra âm thanh (ví dụ: tiếng còi xe, tiếng chim hót hoặc tiếng nổ).
+* Người chơi: Trên điện thoại có các nút hình ảnh tương ứng với các âm thanh. Nghe tiếng gì phải bấm hình đó ngay lập tức.
+* Tính điểm: Chuyển từ phản xạ hình ảnh sang phản xạ âm thanh.
+Vòng 10: Vòng Về Đích - Áp Suất Cuối Cùng (The Final Blitz)
+* Màn hình lớn: Tổng hợp tất cả các thử thách trên nhưng ở tốc độ nhanh gấp đôi. Các hiệu lệnh (Màu, Hướng, Lắc, Chạm) sẽ hiện ra liên tục không nghỉ.
+* Người chơi: Phải thực hiện một chuỗi 10 thao tác liên tiếp cực nhanh.
+* Tính điểm: Vòng này điểm nhân đôi ($x2$). Đây là cơ hội cuối cùng để những người ở top dưới lội ngược dòng.
+
+Tóm Tắt Kịch Bản 10 Vòng
+Vòng	Tên Vòng	Thao Tác Chính	Yếu Tố Thử Thách
+1	Chạm Đúng Màu	Chạm nút màu	Tốc độ nhận diện màu
+2	Vuốt Đúng Hướng	Vuốt màn hình	Hướng không gian
+3	Lắc Điên Cuồng	Lắc điện thoại	Thể lực & Sức mạnh
+4	Chạm Liên Hoàn	Bấm liên tục	Tốc độ ngón tay
+5	Đừng Chạm!	Đứng yên	Sự kiềm chế (Focus)
+6	Con Số May Mắn	Chọn số nhỏ/lớn	Xử lý logic nhanh
+7	Cân Bằng	Giữ yên điện thoại	Sự khéo léo, tĩnh tâm
+8	Truy Tìm	Chọn Icon đúng	Khả năng quan sát
+9	Âm Thanh	Nghe và chọn	Phản xạ thính giác
+10	Về Đích	Tổng hợp siêu tốc	Sức bền & Phản xạ tổng lực
+
+
+
+Rất sẵn lòng! Để giúp bạn có một bộ tài liệu kỹ thuật (Technical Requirements) chuẩn chỉnh cho lập trình viên hoặc để đưa vào hồ sơ dự án, tôi sẽ chi tiết hóa logic vận hành và cách tính điểm của 6 vòng mới này.
+Dưới đây là mô tả chi tiết để bạn đưa vào tài liệu:
+
+CHI TIẾT KỸ THUẬT 6 VÒNG BỔ SUNG
+Vòng 5: Đừng Chạm! (The Trap)
+* Logic: Màn hình điện thoại hiển thị một vùng bấm lớn. Sau một khoảng thời gian ngẫu nhiên (1-3 giây), màn hình lớn hiện chữ "CHẠM" (màu xanh) hoặc "BOM/ĐỪNG CHẠM" (màu đỏ) +âm thanh “bomb”.
+* Cách tính điểm:
+    * Nếu hiện "BOM" mà người chơi chạm: -500 điểm.
+    * Nếu hiện "BOM" mà người chơi đứng yên: +200 điểm.
+    * Nếu hiện "CHẠM" mà người chơi chạm nhanh: Tính điểm theo $ms$ (milisây).
+Vòng 6: Con Số May Mắn (Quick Math)
+* Logic: Server gửi về một mảng 4 số ngẫu nhiên. Màn hình lớn hiển thị yêu cầu: "CHẠM SỐ NHỎ NHẤT" hoặc (vd: tổng trung bình cộng của 4 số ngẫu nhiên đó là 1 số trong đó).
+* Cách tính điểm:
+    * Điểm số = $Max\_Point \times (1 - \frac{Thời\_gian\_phản\_hồi}{Thời\_gian\_cho\_phép})$.
+    * Sai: 0 điểm và khóa màn hình vòng đó.
+Vòng 7: Cân Bằng Tuyệt Đối (Keep It Steady)
+* Logic: Sử dụng API DeviceOrientationEvent để lấy dữ liệu từ con quay hồi chuyển (Gyroscope).
+* Giao diện: Một vòng tròn mục tiêu ở giữa và một dấu cộng (tọa độ của điện thoại).
+* Cách tính điểm: Mỗi 0.1 giây nếu dấu cộng nằm trong vùng an toàn (sai số $\pm 5^{\circ}$) thì người chơi được +10 điểm. Càng về cuối vòng, vùng an toàn càng thu nhỏ lại.
+Vòng 8: Truy Tìm Biểu Tượng (Icon Hunt)
+* Logic: Hiển thị một lưới $4 \times 4$ các biểu tượng tương đồng trên điện thoại.
+* Cách tính điểm: Đây là vòng thuần túy về độ chính xác. Bấm sai biểu tượng mục tiêu sẽ bị đóng băng (freeze) màn hình trong 2 giây. Bấm đúng cực nhanh sẽ được bonus điểm "Combo".
+Vòng 9: Phản Xạ Âm Thanh (Sound Check)
+* Logic: Ứng dụng cần yêu cầu quyền phát âm thanh hoặc dùng loa hội trường.
+* Kỹ thuật: Server phát tín hiệu âm thanh đồng bộ với hiệu lệnh trên màn hình (để tránh độ trễ mạng).
+* Cách tính điểm: Tương tự vòng 1 nhưng không có gợi ý hình ảnh trên màn hình lớn ngay lập tức, người chơi phải dựa hoàn toàn vào tai nghe.
+Vòng 10: Vòng Về Đích (The Final Blitz)
+* Logic: Sử dụng vòng lặp (loop) gọi lại ngẫu nhiên các hàm của 9 vòng trước.
+* Đặc điểm: Tăng tốc độ duration của mỗi thử thách lên 50%.
+* Cách tính điểm: Hệ số $x2$. Đây là lúc bảng xếp hạng (Leaderboard) biến động mạnh nhất để tạo sự kịch tính cho sự kiện.
+
+MỘT SỐ LƯU Ý VỀ UX/UI (TRẢI NGHIỆM NGƯỜI DÙNG)
+Để game "Reflex Royale" này thực sự mượt mà, bạn nên nhắc đội ngũ kỹ thuật lưu ý:
+1. Độ trễ (Latency): Vì là game phản xạ, độ trễ giữa điện thoại và màn hình lớn phải cực thấp (nên dùng WebSockets thay vì HTTP Request thông thường).
+2. Rung (Haptic Feedback): Khi người chơi chạm đúng hoặc sai, điện thoại nên rung nhẹ để tạo cảm giác phản hồi vật lý.
+3. Màu sắc tương phản: Sử dụng các cặp màu tương phản mạnh (Xanh dương - Cam, Đỏ - Xanh lá) để người chơi dễ nhận diện trong điều kiện ánh sáng hội trường phức tạp.
+
+

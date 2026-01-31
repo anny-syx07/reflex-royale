@@ -233,6 +233,24 @@ socket.on('roundStart', ({ roundNumber, totalRounds, roundType, roundData, start
     } else if (roundType === 'TAP_SPAM') {
         displayTapSpamRound(roundData.duration);
         startGlobalTimer(roundData.duration / 1000);
+    } else if (roundType === 'DONT_TAP') {
+        displayDontTapRound(roundData);
+        startGlobalTimer(roundData.duration / 1000);
+    } else if (roundType === 'QUICK_MATH') {
+        displayQuickMathRound(roundData);
+        startGlobalTimer(roundData.duration / 1000);
+    } else if (roundType === 'GYRO_BALANCE') {
+        displayGyroBalanceRound(roundData);
+        startGlobalTimer(roundData.duration / 1000);
+    } else if (roundType === 'ICON_HUNT') {
+        displayIconHuntRound(roundData);
+        startGlobalTimer(roundData.duration / 1000);
+    } else if (roundType === 'SOUND_CHECK') {
+        displaySoundCheckRound(roundData);
+        startGlobalTimer(roundData.duration / 1000);
+    } else if (roundType === 'FINAL_BLITZ') {
+        displayFinalBlitzRound(roundData);
+        startGlobalTimer(roundData.duration / 1000);
     }
 });
 
@@ -343,6 +361,257 @@ function displayTapSpamRound(duration) {
 
         if (timeLeft <= 0) {
             clearInterval(roundTimer);
+        }
+    }, 1000);
+}
+
+// ============== ROUND 5: DON'T TAP ==============
+function displayDontTapRound(roundData) {
+    const dontTapDisplay = document.createElement('div');
+    dontTapDisplay.className = 'dont-tap-display';
+
+    if (roundData.isBomb) {
+        dontTapDisplay.innerHTML = `
+            <div class="trap-indicator bomb">
+                <div class="trap-emoji">💣</div>
+                <h2>ĐỪNG CHẠM!</h2>
+                <p>Ai chạm sẽ bị trừ -500 điểm!</p>
+            </div>
+            <div class="countdown" id="countdown">${roundData.duration / 1000}</div>
+        `;
+    } else {
+        dontTapDisplay.innerHTML = `
+            <div class="trap-indicator safe">
+                <div class="trap-emoji">✅</div>
+                <h2>CHẠM NGAY!</h2>
+                <p>Nhanh tay để được điểm cao!</p>
+            </div>
+            <div class="countdown" id="countdown">${roundData.duration / 1000}</div>
+        `;
+    }
+
+    roundDisplayEl.appendChild(dontTapDisplay);
+
+    // Countdown timer
+    let timeLeft = roundData.duration / 1000;
+    const countdownEl = document.getElementById('countdown');
+
+    roundTimer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(roundTimer);
+        }
+    }, 1000);
+}
+
+// ============== ROUND 6: QUICK MATH ==============
+function displayQuickMathRound(roundData) {
+    const mathDisplay = document.createElement('div');
+    mathDisplay.className = 'quick-math-display';
+
+    const taskText = roundData.task === 'MIN' ? 'SỐ NHỎ NHẤT' : 'SỐ LỚN NHẤT';
+
+    mathDisplay.innerHTML = `
+        <h2>🧮 TÌM ${taskText}!</h2>
+        <div class="number-display">
+            ${roundData.numbers.map(n => `<span class="number-box">${n}</span>`).join('')}
+        </div>
+        <div class="countdown" id="countdown">${roundData.duration / 1000}</div>
+    `;
+
+    roundDisplayEl.appendChild(mathDisplay);
+
+    // Countdown timer
+    let timeLeft = roundData.duration / 1000;
+    const countdownEl = document.getElementById('countdown');
+
+    roundTimer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(roundTimer);
+        }
+    }, 1000);
+}
+
+// ============== ROUND 7: GYRO BALANCE ==============
+function displayGyroBalanceRound(roundData) {
+    const balanceDisplay = document.createElement('div');
+    balanceDisplay.className = 'gyro-balance-display';
+
+    balanceDisplay.innerHTML = `
+        <h2>⚖️ GIỮ THĂNG BẰNG!</h2>
+        <div class="balance-demo">
+            <div class="balance-circle">
+                <div class="balance-target-demo"></div>
+                <div class="balance-cross">+</div>
+            </div>
+        </div>
+        <p>Giữ điện thoại thật phẳng để ghi điểm!</p>
+        <div class="countdown" id="countdown">${roundData.duration / 1000}</div>
+    `;
+
+    roundDisplayEl.appendChild(balanceDisplay);
+
+    // Countdown timer
+    let timeLeft = roundData.duration / 1000;
+    const countdownEl = document.getElementById('countdown');
+
+    roundTimer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(roundTimer);
+        }
+    }, 1000);
+}
+
+// ============== ROUND 8: ICON HUNT ==============
+function displayIconHuntRound(roundData) {
+    const iconHuntDisplay = document.createElement('div');
+    iconHuntDisplay.className = 'icon-hunt-display';
+
+    iconHuntDisplay.innerHTML = `
+        <h2>🔍 TÌM: <span class="target-icon-large">${roundData.targetIcon}</span></h2>
+        <div class="icon-grid-demo">
+            ${roundData.gridIcons.map((icon, i) =>
+        `<span class="grid-icon ${i === roundData.targetPosition ? 'target' : ''}">${icon}</span>`
+    ).join('')}
+        </div>
+        <p>Tìm icon mục tiêu trong lưới 4x4!</p>
+        <div class="countdown" id="countdown">${roundData.duration / 1000}</div>
+    `;
+
+    roundDisplayEl.appendChild(iconHuntDisplay);
+
+    // Countdown timer
+    let timeLeft = roundData.duration / 1000;
+    const countdownEl = document.getElementById('countdown');
+
+    roundTimer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(roundTimer);
+        }
+    }, 1000);
+}
+
+// ============== ROUND 9: SOUND CHECK ==============
+function displaySoundCheckRound(roundData) {
+    const soundCheckDisplay = document.createElement('div');
+    soundCheckDisplay.className = 'sound-check-display';
+
+    soundCheckDisplay.innerHTML = `
+        <h2>🔊 PHẢN XẠ ÂM THANH!</h2>
+        <div class="sound-playing">
+            <audio id="hostSoundAudio" src="${roundData.correctSound.audio}" preload="auto"></audio>
+            <button id="hostPlayBtn" class="host-play-btn">🔊 PHÁT ÂM THANH</button>
+        </div>
+        <p class="sound-hint">Nghe và chọn hình ảnh phù hợp!</p>
+        <div class="countdown" id="countdown">${roundData.duration / 1000}</div>
+    `;
+
+    roundDisplayEl.appendChild(soundCheckDisplay);
+
+    // Host play button
+    const hostPlayBtn = document.getElementById('hostPlayBtn');
+    const hostAudio = document.getElementById('hostSoundAudio');
+
+    if (hostPlayBtn && hostAudio) {
+        hostPlayBtn.onclick = () => {
+            hostAudio.play();
+            hostPlayBtn.textContent = '🔊 ĐANG PHÁT...';
+            hostAudio.onended = () => {
+                hostPlayBtn.textContent = '🔊 PHÁT LẠI';
+            };
+        };
+        // Auto-play
+        setTimeout(() => hostAudio.play(), 500);
+    }
+
+    // Countdown timer
+    let timeLeft = roundData.duration / 1000;
+    const countdownEl = document.getElementById('countdown');
+
+    roundTimer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(roundTimer);
+        }
+    }, 1000);
+}
+
+// ============== ROUND 10: FINAL BLITZ ==============
+function displayFinalBlitzRound(roundData) {
+    const blitzDisplay = document.createElement('div');
+    blitzDisplay.className = 'final-blitz-display';
+
+    blitzDisplay.innerHTML = `
+        <div class="blitz-header-host">
+            <h2>⚡ VỀ ĐÍCH! ⚡</h2>
+            <div class="blitz-multiplier">ĐIỂM x2</div>
+        </div>
+        <div class="blitz-info">
+            <p>10 thử thách liên tiếp</p>
+            <p>Tốc độ siêu nhanh!</p>
+        </div>
+        <div class="blitz-challenge-preview" id="blitzPreview">
+            Đang chờ...
+        </div>
+        <div class="countdown" id="countdown">${roundData.duration / 1000}</div>
+    `;
+
+    roundDisplayEl.appendChild(blitzDisplay);
+
+    // Show challenge progression
+    let currentChallenge = 0;
+    const previewEl = document.getElementById('blitzPreview');
+
+    const challengeTimer = setInterval(() => {
+        if (currentChallenge >= roundData.challenges.length) {
+            clearInterval(challengeTimer);
+            previewEl.textContent = 'HOÀN THÀNH!';
+            return;
+        }
+
+        const challenge = roundData.challenges[currentChallenge];
+        let displayText = '';
+
+        if (challenge.type === 'COLOR') {
+            const colorNames = { RED: 'ĐỎ', BLUE: 'XANH', YELLOW: 'VÀNG', PURPLE: 'TÍM' };
+            displayText = `🎨 CHẠM: ${colorNames[challenge.color]}`;
+        } else if (challenge.type === 'SWIPE') {
+            const arrows = { UP: '⬆️', DOWN: '⬇️', LEFT: '⬅️', RIGHT: '➡️' };
+            displayText = `${arrows[challenge.direction]} VUỐT`;
+        } else if (challenge.type === 'TAP') {
+            displayText = '👆 CHẠM!';
+        } else if (challenge.type === 'MATH') {
+            displayText = `🔢 ${challenge.task === 'MIN' ? 'SỐ NHỎ NHẤT' : 'SỐ LỚN NHẤT'}`;
+        }
+
+        previewEl.innerHTML = `<strong>${currentChallenge + 1}/10:</strong> ${displayText}`;
+        currentChallenge++;
+    }, roundData.challengeDuration);
+
+    // Countdown timer
+    let timeLeft = roundData.duration / 1000;
+    const countdownEl = document.getElementById('countdown');
+
+    roundTimer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(roundTimer);
+            clearInterval(challengeTimer);
         }
     }, 1000);
 }

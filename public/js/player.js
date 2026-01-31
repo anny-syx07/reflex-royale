@@ -18,6 +18,16 @@ let tapCount = 0;
 let touchStartX = 0;
 let touchStartY = 0;
 
+// DON'T TAP variables
+let dontTapTouched = false;
+
+// QUICK MATH variables
+let mathAnswered = false;
+
+// GYRO BALANCE variables
+let balanceInterval = null;
+let balanceScore = 0;
+
 // DOM Elements
 const joinScreen = document.getElementById('joinScreen');
 const waitingScreen = document.getElementById('waitingScreen');
@@ -36,6 +46,39 @@ const tapSpamBtn = document.getElementById('tapSpamBtn');
 const tapCountEl = document.getElementById('tapCount');
 const scoreValue = document.getElementById('scoreValue');
 const feedback = document.getElementById('feedback');
+
+// New round DOM elements
+const dontTapArea = document.getElementById('dontTapArea');
+const trapZone = document.getElementById('trapZone');
+const trapIcon = document.getElementById('trapIcon');
+const trapText = document.getElementById('trapText');
+const trapLabel = document.getElementById('trapLabel');
+const quickMathArea = document.getElementById('quickMathArea');
+const mathTask = document.getElementById('mathTask');
+const numberGrid = document.getElementById('numberGrid');
+const gyroBalanceArea = document.getElementById('gyroBalanceArea');
+const balanceIndicator = document.getElementById('balanceIndicator');
+const balanceScoreDisplay = document.getElementById('balanceScoreDisplay');
+
+// Round 8 & 9 DOM elements
+const iconHuntArea = document.getElementById('iconHuntArea');
+const targetIconDisplay = document.getElementById('targetIconDisplay');
+const iconGrid = document.getElementById('iconGrid');
+const freezeOverlay = document.getElementById('freezeOverlay');
+const finalBlitzArea = document.getElementById('finalBlitzArea');
+const blitzChallengeCount = document.getElementById('blitzChallengeCount');
+const blitzChallengeContainer = document.getElementById('blitzChallengeContainer');
+
+// Blitz variables
+let blitzCurrentChallenge = 0;
+let blitzChallenges = [];
+let blitzTimer = null;
+
+// Sound check DOM elements
+const soundCheckArea = document.getElementById('soundCheckArea');
+const playSoundBtn = document.getElementById('playSoundBtn');
+const soundAudio = document.getElementById('soundAudio');
+const soundOptions = document.getElementById('soundOptions');
 
 // Auto-join from URL params
 const urlParams = new URLSearchParams(window.location.search);
@@ -111,10 +154,21 @@ socket.on('roundStart', ({ roundType, roundData, startTime }) => {
     swipeArea.classList.add('hidden');
     shakeArea.classList.add('hidden');
     tapSpamArea.classList.add('hidden');
+    if (dontTapArea) dontTapArea.classList.add('hidden');
+    if (quickMathArea) quickMathArea.classList.add('hidden');
+    if (gyroBalanceArea) gyroBalanceArea.classList.add('hidden');
+    if (iconHuntArea) iconHuntArea.classList.add('hidden');
+    if (soundCheckArea) soundCheckArea.classList.add('hidden');
+    if (finalBlitzArea) finalBlitzArea.classList.add('hidden');
 
     // Reset counters
     shakeCount = 0;
     tapCount = 0;
+    dontTapTouched = false;
+    mathAnswered = false;
+    balanceScore = 0;
+    blitzCurrentChallenge = 0;
+    blitzChallenges = [];
     shakeCountEl.textContent = '0';
     tapCountEl.textContent = '0';
 
@@ -130,6 +184,18 @@ socket.on('roundStart', ({ roundType, roundData, startTime }) => {
     } else if (roundType === 'TAP_SPAM') {
         tapSpamArea.classList.remove('hidden');
         setupTapSpam();
+    } else if (roundType === 'DONT_TAP') {
+        setupDontTap(roundData);
+    } else if (roundType === 'QUICK_MATH') {
+        setupQuickMath(roundData);
+    } else if (roundType === 'GYRO_BALANCE') {
+        setupGyroBalance(roundData);
+    } else if (roundType === 'ICON_HUNT') {
+        setupIconHunt(roundData);
+    } else if (roundType === 'SOUND_CHECK') {
+        setupSoundCheck(roundData);
+    } else if (roundType === 'FINAL_BLITZ') {
+        setupFinalBlitz(roundData);
     }
 });
 
@@ -285,6 +351,433 @@ function handleTapSpam() {
     }
 }
 
+// ============== ROUND 5: DON'T TAP ==============
+function setupDontTap(roundData) {
+    if (!dontTapArea) return;
+
+    dontTapArea.classList.remove('hidden');
+    dontTapTouched = false;
+
+    // Update UI based on whether it's a bomb or tap command
+    if (roundData.isBomb) {
+        trapIcon.textContent = '💣';
+        trapText.textContent = 'ĐỪNG CHẠM!';
+        trapLabel.textContent = 'Giữ yên tay!';
+        trapZone.style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
+    } else {
+        trapIcon.textContent = '✅';
+        trapText.textContent = 'CHẠM NGAY!';
+        trapLabel.textContent = 'Nhanh tay!';
+        trapZone.style.background = 'linear-gradient(135deg, #44ff44, #00cc00)';
+    }
+
+    // Handle tap on trap zone
+    const handleTrapTap = (e) => {
+        if (currentRoundType !== 'DONT_TAP' || dontTapTouched) return;
+        e.preventDefault();
+        dontTapTouched = true;
+
+        // Visual feedback
+        trapZone.style.transform = 'scale(0.95)';
+        setTimeout(() => trapZone.style.transform = 'scale(1)', 100);
+
+        // Haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate(roundData.isBomb ? [100, 50, 100] : [50]);
+        }
+
+        sendResponse('TAPPED');
+    };
+
+    trapZone.addEventListener('touchstart', handleTrapTap, { passive: false });
+    trapZone.addEventListener('click', handleTrapTap);
+
+    // When round ends, if they didn't tap, send HELD
+    setTimeout(() => {
+        if (currentRoundType === 'DONT_TAP' && !dontTapTouched) {
+            sendResponse('HELD');
+        }
+        trapZone.removeEventListener('touchstart', handleTrapTap);
+        trapZone.removeEventListener('click', handleTrapTap);
+    }, roundData.duration - 100);
+}
+
+// ============== ROUND 6: QUICK MATH ==============
+function setupQuickMath(roundData) {
+    if (!quickMathArea || !numberGrid) return;
+
+    quickMathArea.classList.remove('hidden');
+    mathAnswered = false;
+
+    // Update task text
+    if (roundData.task === 'MIN') {
+        mathTask.textContent = 'Chọn số NHỎ NHẤT';
+    } else {
+        mathTask.textContent = 'Chọn số LỚN NHẤT';
+    }
+
+    // Clear and create number buttons
+    numberGrid.innerHTML = '';
+
+    // Shuffle the numbers for random positions
+    const shuffledNumbers = [...roundData.numbers].sort(() => Math.random() - 0.5);
+
+    shuffledNumbers.forEach(num => {
+        const btn = document.createElement('button');
+        btn.className = 'number-btn';
+        btn.textContent = num;
+        btn.addEventListener('click', () => {
+            if (mathAnswered || currentRoundType !== 'QUICK_MATH') return;
+            mathAnswered = true;
+
+            // Visual feedback
+            btn.style.transform = 'scale(0.9)';
+            const isCorrect = num === roundData.correctAnswer;
+            btn.style.background = isCorrect ? '#44ff44' : '#ff4444';
+
+            // Disable all buttons
+            document.querySelectorAll('.number-btn').forEach(b => b.disabled = true);
+
+            // Haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(isCorrect ? [50] : [50, 50, 50]);
+            }
+
+            sendResponse(num.toString());
+        });
+        numberGrid.appendChild(btn);
+    });
+}
+
+// ============== ROUND 7: GYRO BALANCE ==============
+function setupGyroBalance(roundData) {
+    if (!gyroBalanceArea) return;
+
+    gyroBalanceArea.classList.remove('hidden');
+    balanceScore = 0;
+
+    if (balanceScoreDisplay) {
+        balanceScoreDisplay.textContent = '0 điểm';
+    }
+
+    // Request device orientation permission (iOS 13+)
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation);
+                }
+            })
+            .catch(console.error);
+    } else {
+        window.addEventListener('deviceorientation', handleOrientation);
+    }
+
+    // Check balance every 100ms
+    balanceInterval = setInterval(() => {
+        if (currentRoundType !== 'GYRO_BALANCE') {
+            clearInterval(balanceInterval);
+            return;
+        }
+
+        // Send balance update to server
+        const indicator = document.getElementById('balanceIndicator');
+        const isBalanced = indicator && indicator.classList.contains('balanced');
+
+        if (isBalanced) {
+            balanceScore += 10;
+            if (balanceScoreDisplay) {
+                balanceScoreDisplay.textContent = `${balanceScore} điểm`;
+            }
+        }
+
+        socket.emit('balanceUpdate', {
+            roomCode,
+            balanceScore,
+            isBalanced
+        });
+    }, 100);
+}
+
+function handleOrientation(event) {
+    if (currentRoundType !== 'GYRO_BALANCE') return;
+
+    const beta = event.beta || 0;  // Front-to-back tilt (-180 to 180)
+    const gamma = event.gamma || 0; // Left-to-right tilt (-90 to 90)
+
+    const tolerance = 5; // degrees
+    const isBalanced = Math.abs(beta) <= tolerance && Math.abs(gamma) <= tolerance;
+
+    // Move indicator based on tilt
+    if (balanceIndicator) {
+        // Map gamma (-90 to 90) to x position (-40% to 40%)
+        const xOffset = (gamma / 90) * 40;
+        // Map beta (will use 0-30 range) to y position
+        const yOffset = (beta / 30) * 40;
+
+        balanceIndicator.style.transform = `translate(calc(-50% + ${xOffset}%), calc(-50% + ${yOffset}%))`;
+
+        if (isBalanced) {
+            balanceIndicator.classList.add('balanced');
+            balanceIndicator.style.color = '#44ff44';
+        } else {
+            balanceIndicator.classList.remove('balanced');
+            balanceIndicator.style.color = '#ff4444';
+        }
+    }
+}
+
+// ============== ROUND 8: ICON HUNT ==============
+function setupIconHunt(roundData) {
+    if (!iconHuntArea || !iconGrid) return;
+
+    iconHuntArea.classList.remove('hidden');
+
+    // Set target icon display
+    if (targetIconDisplay) {
+        targetIconDisplay.textContent = roundData.targetIcon;
+    }
+
+    // Clear and create icon grid
+    iconGrid.innerHTML = '';
+
+    let hasResponded = false;
+
+    roundData.gridIcons.forEach((icon, index) => {
+        const iconBtn = document.createElement('button');
+        iconBtn.className = 'icon-btn';
+        iconBtn.textContent = icon;
+        iconBtn.dataset.index = index;
+
+        iconBtn.addEventListener('click', () => {
+            if (hasResponded || currentRoundType !== 'ICON_HUNT') return;
+
+            const isCorrect = index === roundData.targetPosition;
+
+            // Visual feedback
+            if (isCorrect) {
+                hasResponded = true;
+                iconBtn.style.background = '#44ff44';
+                iconBtn.style.transform = 'scale(1.2)';
+
+                if (navigator.vibrate) {
+                    navigator.vibrate([50]);
+                }
+            } else {
+                iconBtn.style.background = '#ff4444';
+                iconBtn.disabled = true;
+
+                // Show freeze overlay
+                if (freezeOverlay) {
+                    freezeOverlay.classList.remove('hidden');
+                    setTimeout(() => {
+                        freezeOverlay.classList.add('hidden');
+                    }, roundData.freezeDuration);
+                }
+
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 50, 50]);
+                }
+            }
+
+            sendResponse(index.toString());
+        });
+
+        iconGrid.appendChild(iconBtn);
+    });
+}
+
+// ============== ROUND 9: SOUND CHECK ==============
+function setupSoundCheck(roundData) {
+    if (!soundCheckArea || !soundOptions) return;
+
+    soundCheckArea.classList.remove('hidden');
+
+    // Set audio source
+    if (soundAudio) {
+        soundAudio.src = roundData.correctSound.audio;
+    }
+
+    // Play sound button
+    if (playSoundBtn) {
+        playSoundBtn.onclick = () => {
+            if (soundAudio) {
+                soundAudio.play();
+                playSoundBtn.textContent = '🔊 ĐANG PHÁT...';
+                soundAudio.onended = () => {
+                    playSoundBtn.textContent = '🔊 PHÁT LẠI';
+                };
+            }
+        };
+        // Auto-play once at start
+        setTimeout(() => {
+            if (soundAudio) soundAudio.play();
+            playSoundBtn.textContent = '🔊 PHÁT LẠI';
+        }, 500);
+    }
+
+    // Clear and create sound options
+    soundOptions.innerHTML = '';
+    let hasResponded = false;
+
+    roundData.allSounds.forEach(sound => {
+        const optionBtn = document.createElement('button');
+        optionBtn.className = 'sound-option-btn';
+        optionBtn.innerHTML = `
+            <img src="${sound.image}" alt="${sound.name}" />
+            <span>${sound.name}</span>
+        `;
+
+        optionBtn.addEventListener('click', () => {
+            if (hasResponded || currentRoundType !== 'SOUND_CHECK') return;
+            hasResponded = true;
+
+            const isCorrect = sound.id === roundData.correctSoundId;
+
+            // Visual feedback
+            optionBtn.style.borderColor = isCorrect ? '#44ff44' : '#ff4444';
+            optionBtn.style.transform = 'scale(1.05)';
+
+            // Stop audio on answer
+            if (soundAudio) soundAudio.pause();
+
+            if (navigator.vibrate) {
+                navigator.vibrate(isCorrect ? [50] : [50, 50, 50]);
+            }
+
+            sendResponse(sound.id);
+        });
+
+        soundOptions.appendChild(optionBtn);
+    });
+}
+
+// ============== ROUND 10: FINAL BLITZ ==============
+function setupFinalBlitz(roundData) {
+    if (!finalBlitzArea || !blitzChallengeContainer) return;
+
+    finalBlitzArea.classList.remove('hidden');
+    blitzChallenges = roundData.challenges;
+    blitzCurrentChallenge = 0;
+
+    // Show first challenge
+    showBlitzChallenge();
+
+    // Auto-advance challenges
+    blitzTimer = setInterval(() => {
+        blitzCurrentChallenge++;
+        if (blitzCurrentChallenge >= blitzChallenges.length) {
+            clearInterval(blitzTimer);
+            return;
+        }
+        showBlitzChallenge();
+    }, roundData.challengeDuration);
+}
+
+function showBlitzChallenge() {
+    if (!blitzChallengeContainer) return;
+
+    const challenge = blitzChallenges[blitzCurrentChallenge];
+    if (!challenge) return;
+
+    // Update progress
+    if (blitzChallengeCount) {
+        blitzChallengeCount.textContent = `${blitzCurrentChallenge + 1}/${blitzChallenges.length}`;
+    }
+
+    // Clear container
+    blitzChallengeContainer.innerHTML = '';
+
+    if (challenge.type === 'COLOR') {
+        // Show color buttons
+        const colorGrid = document.createElement('div');
+        colorGrid.className = 'blitz-color-grid';
+
+        ['RED', 'BLUE', 'YELLOW', 'PURPLE'].forEach(color => {
+            const btn = document.createElement('button');
+            btn.className = `blitz-color-btn blitz-${color.toLowerCase()}`;
+            btn.textContent = color === 'RED' ? 'ĐỎ' : color === 'BLUE' ? 'XANH' : color === 'YELLOW' ? 'VÀNG' : 'TÍM';
+            btn.addEventListener('click', () => {
+                sendBlitzResponse(color);
+                btn.style.transform = 'scale(0.9)';
+            });
+            colorGrid.appendChild(btn);
+        });
+
+        const instruction = document.createElement('h3');
+        instruction.textContent = `CHẠM: ${challenge.color === 'RED' ? 'ĐỎ' : challenge.color === 'BLUE' ? 'XANH' : challenge.color === 'YELLOW' ? 'VÀNG' : 'TÍM'}`;
+        blitzChallengeContainer.appendChild(instruction);
+        blitzChallengeContainer.appendChild(colorGrid);
+
+    } else if (challenge.type === 'SWIPE') {
+        const arrows = { UP: '⬆️', DOWN: '⬇️', LEFT: '⬅️', RIGHT: '➡️' };
+        const instruction = document.createElement('h3');
+        instruction.textContent = `VUỐT ${arrows[challenge.direction]}`;
+        instruction.style.fontSize = '4rem';
+        blitzChallengeContainer.appendChild(instruction);
+
+        // Setup quick swipe detection
+        let startX, startY;
+        blitzChallengeContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        blitzChallengeContainer.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const dx = endX - startX;
+            const dy = endY - startY;
+
+            let direction = '';
+            if (Math.abs(dx) > Math.abs(dy)) {
+                direction = dx > 0 ? 'RIGHT' : 'LEFT';
+            } else {
+                direction = dy > 0 ? 'DOWN' : 'UP';
+            }
+            sendBlitzResponse(direction);
+        });
+
+    } else if (challenge.type === 'TAP') {
+        const tapBtn = document.createElement('button');
+        tapBtn.className = 'blitz-tap-btn';
+        tapBtn.textContent = 'CHẠM!';
+        tapBtn.addEventListener('click', () => {
+            sendBlitzResponse('TAP');
+            tapBtn.style.transform = 'scale(0.9)';
+        });
+        blitzChallengeContainer.appendChild(tapBtn);
+
+    } else if (challenge.type === 'MATH') {
+        const instruction = document.createElement('h3');
+        instruction.textContent = challenge.task === 'MIN' ? 'SỐ NHỎ NHẤT' : 'SỐ LỚN NHẤT';
+
+        const numGrid = document.createElement('div');
+        numGrid.className = 'blitz-number-grid';
+
+        challenge.numbers.forEach(num => {
+            const btn = document.createElement('button');
+            btn.className = 'blitz-number-btn';
+            btn.textContent = num;
+            btn.addEventListener('click', () => {
+                sendBlitzResponse(num.toString());
+                btn.style.transform = 'scale(0.9)';
+            });
+            numGrid.appendChild(btn);
+        });
+
+        blitzChallengeContainer.appendChild(instruction);
+        blitzChallengeContainer.appendChild(numGrid);
+    }
+}
+
+function sendBlitzResponse(answer) {
+    const response = JSON.stringify({
+        challengeIndex: blitzCurrentChallenge,
+        answer: answer
+    });
+    sendResponse(response);
+}
+
 // Send response to server
 function sendResponse(response) {
     const timestamp = Date.now();
@@ -321,13 +814,38 @@ socket.on('roundEnd', () => {
         shakeInterval = null;
     }
 
+    // Clear balance interval
+    if (balanceInterval) {
+        clearInterval(balanceInterval);
+        balanceInterval = null;
+    }
+
+    // Clear blitz timer
+    if (blitzTimer) {
+        clearInterval(blitzTimer);
+        blitzTimer = null;
+    }
+
     window.removeEventListener('devicemotion', handleShake);
+    window.removeEventListener('deviceorientation', handleOrientation);
 
     // Hide all game areas temporarily
     colorButtons.classList.add('hidden');
     swipeArea.classList.add('hidden');
     shakeArea.classList.add('hidden');
     tapSpamArea.classList.add('hidden');
+    if (dontTapArea) dontTapArea.classList.add('hidden');
+    if (quickMathArea) quickMathArea.classList.add('hidden');
+    if (gyroBalanceArea) gyroBalanceArea.classList.add('hidden');
+    if (iconHuntArea) iconHuntArea.classList.add('hidden');
+    if (soundCheckArea) soundCheckArea.classList.add('hidden');
+    if (finalBlitzArea) finalBlitzArea.classList.add('hidden');
+
+    // Stop any playing audio
+    if (soundAudio) {
+        soundAudio.pause();
+        soundAudio.currentTime = 0;
+    }
 });
 
 // Game over

@@ -98,6 +98,72 @@
             <p class="tap-label">lần chạm</p>
         </div>
 
+        <!-- DON'T TAP Area (Round 5) -->
+        <div id="dontTapArea" class="dont-tap-area hidden">
+            <div class="trap-zone" id="trapZone">
+                <div class="trap-icon" id="trapIcon">💣</div>
+                <h2 id="trapText">ĐỪNG CHẠM!</h2>
+                <p class="trap-label" id="trapLabel">Giữ yên tay!</p>
+            </div>
+        </div>
+
+        <!-- QUICK MATH Area (Round 6) -->
+        <div id="quickMathArea" class="quick-math-area hidden">
+            <h2 id="mathTask">Chọn số NHỎ NHẤT</h2>
+            <div class="number-grid" id="numberGrid">
+                <!-- Numbers will be inserted dynamically -->
+            </div>
+        </div>
+
+        <!-- GYRO BALANCE Area (Round 7) -->
+        <div id="gyroBalanceArea" class="gyro-balance-area hidden">
+            <h2>GIỮ THĂNG BẰNG!</h2>
+            <div class="balance-container">
+                <div class="balance-target" id="balanceTarget"></div>
+                <div class="balance-indicator" id="balanceIndicator">+</div>
+            </div>
+            <div class="balance-score" id="balanceScoreDisplay">0 điểm</div>
+        </div>
+
+        <!-- ICON HUNT Area (Round 8) -->
+        <div id="iconHuntArea" class="icon-hunt-area hidden">
+            <h2 id="iconHuntTitle">TÌM: <span id="targetIconDisplay">😂</span></h2>
+            <div class="icon-grid" id="iconGrid">
+                <!-- 4x4 grid of icons will be inserted dynamically -->
+            </div>
+            <div class="freeze-overlay hidden" id="freezeOverlay">
+                <span>❄️ ĐÓNG BĂNG!</span>
+            </div>
+        </div>
+
+        <!-- SOUND CHECK Area (Round 9) -->
+        <div id="soundCheckArea" class="sound-check-area hidden">
+            <h2>🔊 NGHE VÀ CHỌN!</h2>
+            <div class="sound-player">
+                <button id="playSoundBtn" class="play-sound-btn">
+                    🔊 PHÁT ÂM THANH
+                </button>
+                <audio id="soundAudio" preload="auto"></audio>
+            </div>
+            <div class="sound-options" id="soundOptions">
+                <!-- Sound option buttons will be inserted dynamically -->
+            </div>
+        </div>
+
+        <!-- FINAL BLITZ Area (Round 10) -->
+        <div id="finalBlitzArea" class="final-blitz-area hidden">
+            <div class="blitz-header">
+                <h2>⚡ VỀ ĐÍCH! ⚡</h2>
+                <div class="blitz-progress">
+                    <span id="blitzChallengeCount">1/10</span>
+                    <span class="multiplier">x2</span>
+                </div>
+            </div>
+            <div class="blitz-challenge-container" id="blitzChallengeContainer">
+                <!-- Challenge UI will be dynamically inserted -->
+            </div>
+        </div>
+
         <!-- Score Display -->
         <div id="scoreDisplay" class="score-display">
             <div class="score-label">Điểm của bạn</div>
