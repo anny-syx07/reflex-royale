@@ -217,7 +217,16 @@ const PORT = process.env.PORT || 3000;
 
 // Determine static directory based on environment
 const isProduction = process.env.NODE_ENV === 'production';
-const staticDir = isProduction ? 'dist' : 'public';
+let staticDir = isProduction ? 'dist' : 'public';
+
+// SAFETY CHECK: If dist doesn't exist in production, fallback to public
+const fs = require('fs');
+if (isProduction && !fs.existsSync(path.join(__dirname, staticDir))) {
+  console.warn('⚠️  WARNING: dist/ folder not found in production! Falling back to public/');
+  console.warn('⚠️  This usually means the build step failed. Check build logs!');
+  staticDir = 'public';
+}
+
 console.log(`📂 Serving static files from: ${staticDir}/ (${isProduction ? 'production' : 'development'} mode)`);
 
 // Serve static files
