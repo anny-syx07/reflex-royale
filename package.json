@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node build.js",
     "start": "node server.js",
-    "start:prod": "npm run build && NODE_ENV=production node server.js",
+    "start:prod": "node start-prod.js",
     "dev": "node --watch server.js"
   },
   "keywords": [
