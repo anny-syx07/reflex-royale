@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile API Test - Reflex Royale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .test-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            border-left: 4px solid #4ade80;
+        }
+
+        .result.error {
+            border-left: 4px solid #f87171;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.online {
+            background: #4ade80;
+            color: #000;
+        }
+
+        .status-badge.offline {
+            background: #f87171;
+            color: #fff;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            opacity: 0.7;
+        }
+
+        .metric-value {
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📱 Mobile API Test</h1>
+        <p class="subtitle">Test Reflex Royale Server APIs</p>
+
+        <!-- Health Check -->
+        <div class="test-section">
+            <h2>
+                <span>🏥</span>
+                <span>Health Check</span>
+                <span id="healthStatus" class="status-badge offline">Offline</span>
+            </h2>
+            <button onclick="testHealth()">Test Server Health</button>
+            <div id="healthResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Ping Test -->
+        <div class="test-section">
+            <h2>🏓 Network Latency</h2>
+            <button onclick="testPing()">Test Ping (5x)</button>
+            <div id="pingMetrics" style="display: none; margin-top: 10px;">
+                <div class="metric">
+                    <span class="metric-label">Average Latency:</span>
+                    <span class="metric-value" id="avgLatency">-</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Min / Max:</span>
+                    <span class="metric-value" id="minMaxLatency">-</span>
+                </div>
+            </div>
+            <div id="pingResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Device Info -->
+        <div class="test-section">
+            <h2>📱 Device Info</h2>
+            <button onclick="testDeviceInfo()">Send Device Info</button>
+            <div id="deviceResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Room Check -->
+        <div class="test-section">
+            <h2>🚪 Room Status</h2>
+            <input type="text" id="roomCodeInput" placeholder="Enter room code (4 digits)" maxlength="4"
+                pattern="[0-9]{4}">
+            <button onclick="testRoomStatus()">Check Room</button>
+            <div id="roomResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Server Info -->
+        <div class="test-section">
+            <h2>ℹ️ Server Info</h2>
+            <button onclick="testServerInfo()">Get Server Info</button>
+            <div id="infoResult" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isError ? 'error' : 'success'}`;
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                showResult('healthResult', data);
+
+                // Update status badge
+                const badge = document.getElementById('healthStatus');
+                badge.className = 'status-badge online';
+                badge.textContent = 'Online';
+            } catch (error) {
+                showResult('healthResult', { error: error.message }, true);
+
+                const badge = document.getElementById('healthStatus');
+                badge.className = 'status-badge offline';
+                badge.textContent = 'Offline';
+            }
+        }
+
+        async function testPing() {
+            const latencies = [];
+            let results = '';
+
+            for (let i = 1; i <= 5; i++) {
+                try {
+                    const clientTime = Date.now();
+                    const response = await fetch(`${API_BASE}/api/test/ping?t=${clientTime}`);
+                    const data = await response.json();
+                    const roundTripLatency = Date.now() - clientTime;
+
+                    latencies.push(roundTripLatency);
+                    results += `Ping ${i}: ${roundTripLatency}ms\n`;
+                } catch (error) {
+                    results += `Ping ${i}: Error - ${error.message}\n`;
+                }
+            }
+
+            // Calculate metrics
+            if (latencies.length > 0) {
+                const avg = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
+                const min = Math.min(...latencies);
+                const max = Math.max(...latencies);
+
+                document.getElementById('avgLatency').textContent = `${avg}ms`;
+                document.getElementById('minMaxLatency').textContent = `${min}ms / ${max}ms`;
+                document.getElementById('pingMetrics').style.display = 'block';
+            }
+
+            showResult('pingResult', { results, latencies });
+        }
+
+        async function testDeviceInfo() {
+            const deviceInfo = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                viewportWidth: window.innerWidth,
+                viewportHeight: window.innerHeight,
+                devicePixelRatio: window.devicePixelRatio,
+                orientation: window.screen.orientation?.type || 'unknown',
+                touchSupport: 'ontouchstart' in window,
+                online: navigator.onLine,
+                connectionType: navigator.connection?.effectiveType || 'unknown'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/test/device-info`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ deviceInfo })
+                });
+                const data = await response.json();
+                showResult('deviceResult', data);
+            } catch (error) {
+                showResult('deviceResult', { error: error.message }, true);
+            }
+        }
+
+        async function testRoomStatus() {
+            const roomCode = document.getElementById('roomCodeInput').value.trim();
+
+            if (!roomCode || !/^\d{4}$/.test(roomCode)) {
+                showResult('roomResult', { error: 'Please enter a valid 4-digit room code' }, true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/test/room/${roomCode}`);
+                const data = await response.json();
+                showResult('roomResult', data, !data.exists);
+            } catch (error) {
+                showResult('roomResult', { error: error.message }, true);
+            }
+        }
+
+        async function testServerInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/api/info`);
+                const data = await response.json();
+                showResult('infoResult', data);
+            } catch (error) {
+                showResult('infoResult', { error: error.message }, true);
+            }
+        }
+
+        // Auto-test health on load
+        window.addEventListener('load', () => {
+            testHealth();
+        });
+    </script>
+</body>
+
+</html>

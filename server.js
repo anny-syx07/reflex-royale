@@ -246,6 +246,101 @@ app.post('/verify-host-password', authLimiter, (req, res) => {
   }
 });
 
+// ============================================================================
+// 📱 MOBILE TESTING API ENDPOINTS
+// ============================================================================
+
+// Health check endpoint - for testing if server is reachable
+app.get('/api/health', (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip;
+  res.json({
+    status: 'OK',
+    message: 'Server is running! 🚀',
+    timestamp: new Date().toISOString(),
+    serverTime: Date.now(),
+    environment: isProduction ? 'production' : 'development',
+    clientIp: ip
+  });
+});
+
+// Device info test - returns what server sees from mobile
+app.post('/api/test/device-info', (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip;
+  const userAgent = req.headers['user-agent'] || 'Unknown';
+  const { deviceInfo } = req.body;
+
+  res.json({
+    success: true,
+    message: 'Device info received! 📱',
+    serverSaw: {
+      ip,
+      userAgent,
+      headers: {
+        'accept-language': req.headers['accept-language'],
+        'accept-encoding': req.headers['accept-encoding']
+      }
+    },
+    clientSent: deviceInfo || null,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Network latency test - ping/pong for testing connection speed
+app.get('/api/test/ping', (req, res) => {
+  const clientTimestamp = req.query.t || Date.now();
+  const serverTimestamp = Date.now();
+
+  res.json({
+    success: true,
+    message: 'Pong! 🏓',
+    clientTimestamp: parseInt(clientTimestamp),
+    serverTimestamp,
+    latency: serverTimestamp - parseInt(clientTimestamp)
+  });
+});
+
+// Room status check - for testing if room exists
+app.get('/api/test/room/:roomCode', (req, res) => {
+  const roomCode = validateRoomCode(req.params.roomCode);
+
+  if (!roomCode) {
+    return res.json({
+      exists: false,
+      error: 'Invalid room code format'
+    });
+  }
+
+  const room = rooms.get(roomCode);
+
+  if (!room) {
+    return res.json({
+      exists: false,
+      message: 'Room not found'
+    });
+  }
+
+  res.json({
+    exists: true,
+    roomCode,
+    gameMode: room.gameMode || 'REFLEX',
+    gameState: room.gameState,
+    playerCount: room.players.size,
+    currentRound: room.currentRound || 0
+  });
+});
+
+// Server info - for debugging
+app.get('/api/info', (req, res) => {
+  res.json({
+    name: 'Reflex Royale Server',
+    version: '1.0.0',
+    environment: isProduction ? 'production' : 'development',
+    activeRooms: rooms.size,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Room storage
 const rooms = new Map();
 
