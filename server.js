@@ -20,7 +20,9 @@ const allowedOrigins = [
   'https://reflex-royale.onrender.com',
   'https://reflex-royale-production.up.railway.app',
   'http://localhost:3000',
-  'http://localhost:10000'
+  'http://localhost:10000',
+  'http://10.11.10.33',
+  'http://eventgame.umt.edu.vn'
 ];
 
 // Socket.IO with security options
@@ -50,8 +52,9 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: ["'self'", "wss:", "ws:", ...allowedOrigins],
-      imgSrc: ["'self'", "data:", "blob:", "https://api.dicebear.com"],
-      frameSrc: ["'self'", "https://drive.google.com", "https://www.youtube.com"]
+      imgSrc: ["'self'", "data:", "blob:", "https://api.dicebear.com", "https://cdn.jsdelivr.net"],
+      frameSrc: ["'self'", "https://drive.google.com", "https://www.youtube.com"],
+      upgradeInsecureRequests: null // Disable: server runs HTTP only (no HTTPS)
     }
   },
   crossOriginEmbedderPolicy: false
