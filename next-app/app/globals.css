@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/**
+ * 📚 KIẾN THỨC: globals.css
+ *
+ * Đây là CSS toàn cục, áp dụng cho toàn bộ app.
+ * Thay vì viết @font-face trong mỗi file HTML, giờ chỉ cần ở đây.
+ *
+ * @layer base: CSS cơ bản (reset, font, body)
+ * @layer components: Reusable UI classes
+ * @layer utilities: Helper classes
+ */
+
+@layer base {
+  /* Custom Pixel Fonts */
+  @font-face {
+    font-family: "Pixel Game";
+    src: url("/assets/font/PixelGame.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Pixel Game Extrude";
+    src: url("/assets/font/PixelGameExtrude.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "KVN";
+    src: url("/assets/font/kvn-97.ttf") format("truetype");
+  }
+
+  @font-face {
+    font-family: "SVN-Determination";
+    src: url("/assets/font/SVN-DeterminationSans.ttf") format("truetype");
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* CSS Variables (Custom Properties) */
+  :root {
+    --mario-blue: #5c94fc;
+    --pixel-brown: #8b4513;
+    --pixel-yellow: #ffc107;
+    --pixel-green: #228b22;
+    --pixel-dark: #000000;
+  }
+}
+
+@layer components {
+  /* Pixel button — nút game kiểu cổ điển */
+  .btn-pixel {
+    @apply font-bold border-4 border-black cursor-pointer transition-all duration-100;
+    box-shadow: 4px 4px 0px #000;
+    font-family: "Press Start 2P", cursive;
+  }
+
+  .btn-pixel:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000;
+  }
+
+  /* Game screen base */
+  .screen {
+    @apply min-h-screen w-full;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Gradient text effect */
+  .text-gradient {
+    background: linear-gradient(180deg, #a78bfa, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Loading spinner */
+  .loading-spinner {
+    @apply w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin;
+  }
+
+  /* Pixel panel */
+  .pixel-panel {
+    background: #e8d4a8;
+    border: 8px solid #8b4513;
+    box-shadow: 8px 8px 0px #000;
+  }
+}
+
+@layer utilities {
+  /* Mario sky background */
+  .bg-mario-sky {
+    background-color: #5c94fc;
+  }
+
+  /* Pixel font */
+  .font-pixel {
+    font-family: "Press Start 2P", cursive;
+  }
+
+  .font-pixel-game {
+    font-family: "Pixel Game", "Press Start 2P", cursive;
+  }
+
+  /* Text shadow pixel style */
+  .text-shadow-pixel {
+    text-shadow: 3px 3px 0px #000;
+  }
+
+  /* Animation: bounce title */
+  .animate-bounce-in {
+    animation: bounceIn 0.6s ease-out;
+  }
+
+  /* Animation: float cloud */
+  .animate-float-cloud {
+    animation: floatCloud linear infinite;
+  }
+}
+
+/* Keyframe animations */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  60% {
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatCloud {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100vw + 200px));
+  }
+}
+
+@keyframes blockBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes marioSprite {
+  from { background-position: 0 0; }
+  to { background-position: -280px 0; }
+}
+
+@keyframes runMario {
+  0% { left: -50px; transform: scaleX(1); }
+  49% { left: calc(100% + 50px); transform: scaleX(1); }
+  50% { left: calc(100% + 50px); transform: scaleX(-1); }
+  99% { left: -50px; transform: scaleX(-1); }
+  100% { left: -50px; transform: scaleX(1); }
+}
+
+@keyframes modalBounce {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Confetti animation */
+.confetti {
+  position: absolute;
+  top: -50px;
+  animation: confettiFall linear forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+
+@keyframes confettiFall {
+  to {
+    transform: translateY(110vh) rotate(720deg);
+  }
+}
