@@ -100,6 +100,14 @@ reflex-royale/
 
 📐 **Xem chi tiết**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
+### 📚 Tài liệu kỹ thuật (Technical Documentation)
+- [Hệ thống Kiến trúc (Architecture)](docs/technical/ARCHITECTURE_DETAILED.md)
+- [Triển khai Backend (Backend Implementation)](docs/technical/BACKEND_IMPLEMENTATION.md)
+- [Cơ chế Game (Game Mechanics)](docs/technical/GAME_MECHANICS.md)
+- [Hệ thống Database (Database Systems)](docs/technical/DATABASE_SYSTEMS.md)
+- [Bảo mật & Hiệu suất (Security & Performance)](docs/technical/SECURITY_AND_PERFORMANCE.md)
+- [Ý tưởng Cấu trúc (Structural Ideas)](docs/technical/STRUCTURAL_IDEAS.md)
+
 ---
 
 ## 🛠️ Tech Stack
