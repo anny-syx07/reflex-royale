@@ -100,6 +100,18 @@ reflex-royale/
 
 📐 **Xem chi tiết**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
+### 📚 Tài liệu kỹ thuật (Technical Documentation)
+- [Hệ thống Kiến trúc (Architecture)](docs/technical/ARCHITECTURE_DETAILED.md)
+- [Triển khai Backend (Backend Implementation)](docs/technical/BACKEND_IMPLEMENTATION.md)
+- [Cơ chế Game (Game Mechanics)](docs/technical/GAME_MECHANICS.md)
+- [Hệ thống Database (Database Systems)](docs/technical/DATABASE_SYSTEMS.md)
+- [Bảo mật & Hiệu suất (Security & Performance)](docs/technical/SECURITY_AND_PERFORMANCE.md)
+- [Ý tưởng Cấu trúc (Structural Ideas)](docs/technical/STRUCTURAL_IDEAS.md)
+
+### 🎓 Dành cho Sinh viên (For Students)
+- [Hướng dẫn Hiện đại hóa (Modernization Guide)](docs/modernization_guide.md) - Cách chuyển sang Next.js & TypeScript.
+- [Lộ trình Học tập (Learning Roadmap)](docs/STUDENT_ROADMAP.md) - Kế hoạch 8 tuần để làm chủ công nghệ mới.
+
 ---
 
 ## 🛠️ Tech Stack
